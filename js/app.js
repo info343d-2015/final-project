@@ -27,7 +27,8 @@ app.factory('UserService', function(SystemService) {
     var Auth = $firebaseAuth(SystemService.ref);
     var usersRef = ref.child('users');
 
-    service.users = $firebaseObject(usersRef);
+    var users = $firebaseObject(usersRef);
+    service.user = {};
 
     service.signup = function (email, password) {
         console.log("creating user " + email);
@@ -36,19 +37,19 @@ app.factory('UserService', function(SystemService) {
                 'email': email,
                 'password': password
             })
-            .then($scope.signIn).then(function (authData) {
-                if (!$scope.newUser.avatar) {
-                    $scope.newUser.avatar = "img/no-pic.png";
+            .then(service.signin).then(function (authData) {
+                if (!service.user.avatar) {
+                    service.user.avatar = "img/no-pic.png";
                 }
 
                 var newUserInfo = {
-                    'avatar': $scope.newUser.avatar
+                    'avatar': service.user.avatar
                 };
-                $scope.users[authData.uid] = newUserInfo;
+                users[authData.uid] = newUserInfo;
 
-                $scope.users.$save();
+                users.$save();
 
-                $scope.userId = authData.uid;
+                service.userId = authData.uid;
             })
             .catch(function (error) {
                 console.log(error);
@@ -69,8 +70,7 @@ app.factory('UserService', function(SystemService) {
     Auth.$onAuth(function (authData) {
         if (authData) {
             service.userId = authData.uid;
-        }
-        else {
+        } else {
             service.userId = undefined;
         }
     });
