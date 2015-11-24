@@ -12,9 +12,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HomeCtrl', ['$scope', 'ProductService', function($scope, ProductService) {
+app.controller('HomeCtrl', function($scope, ProductService) {
 
-}]);
+});
 
 app.factory('SystemService', function() {
     var service = {};
