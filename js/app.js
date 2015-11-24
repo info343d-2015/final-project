@@ -68,12 +68,16 @@ app.factory('UserService', function(SystemService) {
 
     Auth.$onAuth(function (authData) {
         if (authData) {
-            $scope.userId = authData.uid;
+            service.userId = authData.uid;
         }
         else {
-            $scope.userId = undefined;
+            service.userId = undefined;
         }
     });
+
+    service.isLoggedIn = function() {
+        return service.userId !== undefined;
+    };
 
     return service;
 });
