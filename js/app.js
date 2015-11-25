@@ -30,7 +30,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
     var users = $firebaseObject(usersRef);
     service.user = {};
 
-    service.signup = function (email, password) {
+    service.signup = function (email, password, name) {
         console.log("creating user " + email);
 
         Auth.$createUser({
@@ -41,15 +41,19 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
                 if (!service.user.avatar) {
                     service.user.avatar = "img/no-pic.png";
                 }
+                if (!service.user.name) {
+                    service.user.name = name;
+                }
 
                 var newUserInfo = {
-                    'avatar': service.user.avatar
+                    'avatar': service.user.avatar,
+                    'name': service.user.name
                 };
                 users[authData.uid] = newUserInfo;
 
                 users.$save();
 
-                service.userId = authData.uid;
+                service.user.userId = authData.uid;
             })
             .catch(function (error) {
                 console.log(error);
@@ -69,9 +73,9 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
 
     Auth.$onAuth(function (authData) {
         if (authData) {
-            service.userId = authData.uid;
+            service.user.userId = authData.uid;
         } else {
-            service.userId = undefined;
+            service.user.userId = undefined;
         }
     });
 
@@ -82,7 +86,41 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
     return service;
 });
 
-app.factory('ProductService', function(SystemService) {
+app.factory('ProductService', function($firebaseArray, SystemService) {
     var service = {};
+    var productsRef = SystemService.ref.child('products');
+    service.products = $firebaseArray(productsRef);
+
+    service.CreateProduct = function(name, description, price) {
+        var obj = {};
+        obj.name = name;
+        obj.description = description;
+        obj.price = price;
+        obj.reviews = {};
+        obj.stock = 0;
+        service.products.$add(obj);
+    };
+
+    return service;
+});
+
+app.factory('CartService', function($firebaseObject, SystemService, UserService) {
+    var service = {};
+    var cartsRef = SystemService.ref.child('carts');
+    var carts = $firebaseObject(cartsRef);
+
+    if(UserService.isLoggedIn()) {
+        service.cart = carts[UserService.user.userId];
+        if(!service.cart.items) {
+            service.cart.items = {};
+        }
+    } else {
+        service.cart = undefined;
+    }
+
+    var addtoCart = function(product) {
+        // TODO: Add a product to the user's cart
+    };
+
     return service;
 });
