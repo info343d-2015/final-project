@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap']);
+var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
@@ -12,7 +12,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HomeCtrl', function($scope, ProductService) {
+app.controller('HomeCtrl', function($scope, UserService, ProductService) {
 
 });
 
@@ -22,10 +22,10 @@ app.factory('SystemService', function() {
     return service;
 });
 
-app.factory('UserService', function(SystemService) {
+app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemService) {
     var service = {};
     var Auth = $firebaseAuth(SystemService.ref);
-    var usersRef = ref.child('users');
+    var usersRef = SystemService.ref.child('users');
 
     var users = $firebaseObject(usersRef);
     service.user = {};
