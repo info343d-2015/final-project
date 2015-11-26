@@ -7,9 +7,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/',
             templateUrl: 'partials/home.html',
             controller: 'HomeCtrl'
+        })
+        .state('account', {
+            url: '/account',
+            templateUrl: 'partials/user/account.html'
         });
 
     $urlRouterProvider.otherwise('/');
+});
+
+app.controller('HeaderCtrl', function($scope, UserService) {
+    $scope.name = UserService.user.name;
 });
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
@@ -37,7 +45,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
                 'email': email,
                 'password': password
             })
-            .then(service.signin).then(function (authData) {
+            .then(service.signin(email, password)).then(function (authData) {
                 if (!service.user.avatar) {
                     service.user.avatar = "img/no-pic.png";
                 }
