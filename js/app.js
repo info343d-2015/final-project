@@ -112,14 +112,18 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     if(UserService.isLoggedIn()) {
         service.cart = carts[UserService.user.userId];
         if(!service.cart.items) {
-            service.cart.items = {};
+            service.cart.items = [];
         }
     } else {
         service.cart = undefined;
     }
 
     var addtoCart = function(product) {
-        // TODO: Add a product to the user's cart
+        if(!service.cart.items.contains(product)) {
+            service.cart.items.push(product);
+        } else {
+            service.cart.items[service.cart.items.indexOf(product)].quantity += product.quantity;
+        }
     };
 
     return service;
