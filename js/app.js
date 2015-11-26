@@ -119,10 +119,22 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     }
 
     var addtoCart = function(product) {
-        if(!service.cart.items.contains(product)) {
-            service.cart.items.push(product);
+        var item = {};
+        item.key = product.key();
+        item.quantity = product.quantity;
+        if(indexOf(item, service.cart.items) === -1) {
+            service.cart.items.push(item);
         } else {
-            service.cart.items[service.cart.items.indexOf(product)].quantity += product.quantity;
+            service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
+        }
+
+        function indexOf(o, arr) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i].key == o.key) {
+                    return i;
+                }
+            }
+            return -1;
         }
     };
 
