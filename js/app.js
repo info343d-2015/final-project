@@ -9,8 +9,22 @@ app.config(function($stateProvider, $urlRouterProvider) {
             controller: 'HomeCtrl'
         })
         .state('account', {
-            url: '/account',
+            url: '/user/account',
             templateUrl: 'partials/user/account.html'
+        })
+        .state('login', {
+            url: '/user/login',
+            templateUrl: 'partials/user/login.html',
+            controller: 'UserCtrl'
+        })
+        .state('logout', {
+            url: '/user/logout',
+            controller: 'LogoutCtrl'
+        })
+        .state('signup', {
+            url: '/user/signup',
+            templateUrl: 'partials/user/signup.html',
+            controller: 'UserCtrl'
         });
 
     $urlRouterProvider.otherwise('/');
@@ -18,6 +32,20 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 app.controller('HeaderCtrl', function($scope, UserService) {
     $scope.name = UserService.user.name;
+});
+
+app.controller('UserCtrl', function($scope, UserService) {
+    $scope.signin = function(login) {
+        UserService.signin(login.email, login.password);
+    };
+    $scope.signup = function(signup) {
+        UserService.signup(signup.email, signup.password, signup.name);
+    };
+});
+
+app.controller('LogoutCtrl', function($scope, $location, UserService) {
+    UserService.logout();
+    $location.path( "/" );
 });
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
@@ -69,6 +97,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
     };
 
     service.signin = function (email, password) {
+        console.log('signing in ' + email);
         return Auth.$authWithPassword({
             'email': email,
             'password': password
@@ -88,7 +117,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
     });
 
     service.isLoggedIn = function() {
-        return service.userId !== undefined;
+        return service.user.userId !== undefined;
     };
 
     return service;
