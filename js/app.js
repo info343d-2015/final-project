@@ -25,6 +25,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/user/signup',
             templateUrl: 'partials/user/signup.html',
             controller: 'UserCtrl'
+        })
+        .state('product-list', {
+            url: '/products',
+            templateUrl: 'partials/product/product-list.html',
+            controller: 'ProductCtrl'
+        })
+        .state('product-detail', {
+            url: '/products/{id}',
+            templateUrl: 'partials/product/product-detail.html',
+            controller: 'ProductCtrl'
         });
 
     $urlRouterProvider.otherwise('/');
@@ -43,13 +53,28 @@ app.controller('UserCtrl', function($scope, UserService) {
     };
 });
 
+app.controller('ProductCtrl', function($scope, $stateParams, $filter, ProductService, CartService) {
+    $scope.products = ProductService.products;
+    $scope.addToCart = CartService.addToCart;
+
+    if($stateParams.id !== undefined) {
+        //$scope.product = $scope.products.$getRecord($stateParams.id);
+        $scope.products.$loaded(function() {
+            $scope.product = $filter('filter')($scope.products, {
+                stub: $stateParams.id
+            }, true)[0];
+        });
+
+    }
+});
+
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
     UserService.logout();
     $location.path( "/" );
 });
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
-
+    $scope.products = ProductService.products;
 });
 
 app.factory('SystemService', function() {
@@ -111,8 +136,14 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
     Auth.$onAuth(function (authData) {
         if (authData) {
             service.user.userId = authData.uid;
+            users.$loaded(function() {
+                service.user.name = users[authData.uid].name;
+                service.user.avatar = users[authData.uid].avatar;
+            });
         } else {
             service.user.userId = undefined;
+            service.user.name = undefined;
+            service.user.avatar = undefined;
         }
     });
 
@@ -126,16 +157,33 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
 app.factory('ProductService', function($firebaseArray, SystemService) {
     var service = {};
     var productsRef = SystemService.ref.child('products');
+    var categoriesRef = SystemService.ref.child('categories');
     service.products = $firebaseArray(productsRef);
+    service.categories = $firebaseArray(categoriesRef);
 
     service.CreateProduct = function(name, description, price) {
         var obj = {};
         obj.name = name;
         obj.description = description;
         obj.price = price;
-        obj.reviews = {};
+        obj.reviews = [];
         obj.stock = 0;
+        obj.stub = name.toLowerCase().replace(/ /g,"-");
         service.products.$add(obj);
+    };
+
+    service.CreateCategory = function(name, description) {
+        var obj = {};
+        obj.name = name;
+        obj.description = description;
+        obj.products = [];
+        service.categories.$add(obj);
+    };
+
+    service.AddToCategory = function(name, product) {
+        categoriesRef.startAt(name).endAt(name).once('value', function(snap) {
+            console.log(snap);
+        });
     };
 
     return service;
@@ -148,8 +196,8 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
 
     if(UserService.isLoggedIn()) {
         service.cart = carts[UserService.user.userId];
-        if(!service.cart.items) {
-            service.cart.items = [];
+        if(!service.cart) {
+            service.cart = [];
         }
     } else {
         service.cart = undefined;
