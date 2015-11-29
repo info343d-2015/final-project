@@ -26,7 +26,24 @@ body {
  */
 /* Hide for mobile, show later */
 .sidebar {
-  display: none; }
+  display: none;
+}
+/*
+ * For home partial
+ */
+img.product-img {
+  max-height: 100px;
+}
+
+.recommended-product {
+  border: 2px solid darkgrey;
+  padding: 8px;
+  width: 175px;
+}
+
+h3.product-title {
+  text-align: center;
+}
 
 @media (min-width: 768px) {
   .sidebar {

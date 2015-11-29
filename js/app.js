@@ -21,7 +21,7 @@ app.controller('HeaderCtrl', function($scope, UserService) {
 });
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
-
+    
 });
 
 app.factory('SystemService', function() {

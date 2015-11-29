@@ -10,7 +10,7 @@
 
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top" ng-controller="HeaderCtrl">
+    <nav class="navbar navbar-fixed-top navbar-default" ng-controller="HeaderCtrl">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -22,12 +22,21 @@
                 <a class="navbar-brand" href="#">Fire Store</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                <form class="navbar-form navbar-left" role="search">
+                  <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Search">
+                  </div>
+                  <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                </form>
                 <ul id="user-status" class="nav navbar-nav navbar-right">
+                    <!-- if user is signed in-->
                     <li>Hello, {{ name }}</li>
-                    <li><a href="#">Dashboard</a></li>
-                    <li><a href="#">Settings</a></li>
-                    <li><a href="#">Profile</a></li>
-                    <li><a href="#">Help</a></li>
+                    <!-- else -->
+                    <li><button type="submit" class="btn btn-default navbar-btn">Sign In</button></li>
+                    <!-- Only show if they are signed in-->
+                    <li><a ui-sref="account">Profile</a></li>
+                    <li><a ui-sref="cart"><i class="fa fa-shopping-cart fa-lg"></a></i>
                 </ul>
             </div>
         </div>
