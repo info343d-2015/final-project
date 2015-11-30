@@ -5,3 +5,7 @@
     <h4>{{review.title}} - {{review.rating}}</h4>
     <p>{{review.body}}</p>
 </div>
+<form>
+    <input type="text" placeholder="Category" ng-model="newCategory"/>
+    <input type="submit" ng-click="addCategory(product, newCategory)" />
+</form>

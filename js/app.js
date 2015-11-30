@@ -58,6 +58,8 @@ app.controller('UserCtrl', function($scope, $location, UserService) {
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, ProductService, CartService) {
     $scope.products = ProductService.products;
     $scope.addToCart = CartService.addToCart;
+    $scope.addCategory = ProductService.AddCategory;
+    $scope.newCategory = undefined;
 
     if($stateParams.id !== undefined) {
         //$scope.product = $scope.products.$getRecord($stateParams.id);
@@ -147,6 +149,8 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
             });
         } else {
             service.user.userId = undefined;
+            service.user.name = undefined;
+            service.user.avatar = undefined;
         }
     });
 
@@ -160,9 +164,25 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
 app.factory('ProductService', function($firebaseArray, SystemService) {
     var service = {};
     var productsRef = SystemService.ref.child('products');
-    var categoriesRef = SystemService.ref.child('categories');
+    service.categories = [];
     service.products = $firebaseArray(productsRef);
-    service.categories = $firebaseArray(categoriesRef);
+
+    var updateCategories = function() {
+        service.products.$loaded(function() {
+            for(var i = 0; i < service.products.length; i++) {
+                var product = service.products[i];
+                if(product.categories) {
+                    product.categories.forEach(function(prodCat) {
+                        if(service.categories.indexOf(prodCat) === -1) {
+                            service.categories.push(prodCat);
+                        }
+                    });
+                }
+            }
+        });
+    };
+
+    updateCategories();
 
     service.CreateProduct = function(name, description, price) {
         var obj = {};
@@ -190,18 +210,15 @@ app.factory('ProductService', function($firebaseArray, SystemService) {
         service.products.$save(productRef);
     };
 
-    service.CreateCategory = function(name, description) {
-        var obj = {};
-        obj.name = name;
-        obj.description = description;
-        obj.products = [];
-        service.categories.$add(obj);
-    };
-
-    service.AddToCategory = function(name, product) {
-        categoriesRef.startAt(name).endAt(name).once('value', function(snap) {
-            console.log(snap);
-        });
+    service.AddCategory = function(product, name) {
+        var productRef = service.products.$getRecord(product.$id);
+        if(productRef.categories === undefined) {
+            productRef.categories = [];
+        }
+        if(productRef.categories.indexOf(name) === -1) {
+            productRef.categories.push(name);
+        }
+        service.products.$save(productRef);
     };
 
     return service;
