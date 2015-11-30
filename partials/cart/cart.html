@@ -1,3 +1,5 @@
 <div ng-repeat="item in process(cart.items)">
-    <p>{{item.name}}</p>
+    <p>{{item.product.name}}</p>
+    <p>Quantity: {{item.quantity}}</p>
+    <p><a ng-click="removeProduct(item)">Remove</a></p>
 </div>

@@ -23,11 +23,11 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul id="user-status" class="nav navbar-nav navbar-right">
-                    <li ng-show="user.userId !== undefined"><a href="#">Welcome, {{ user.name }}</a></li>
-                    <li><a href="#">Settings</a></li>
-                    <li><a href="#">Profile</a></li>
-                    <li ng-show="user.userId === undefined"><a ui-sref="login">Login</a></li>
-                    <li ng-show="user.userId !== undefined"><a ui-sref="logout">Logout</a></li>
+                    <li ng-show="user.userId"><a>Welcome, {{ user.name }}</a></li>
+                    <li ng-show="user.userId"><a ui-sref="account">Settings</a></li>
+                    <li ng-show="user.userId"><a ui-sref="cart">Cart</a></li>
+                    <li ng-show="!user.userId"><a ui-sref="login">Login</a></li>
+                    <li ng-show="user.userId"><a ui-sref="logout">Logout</a></li>
                 </ul>
             </div>
         </div>

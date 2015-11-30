@@ -52,22 +52,25 @@ app.controller('HeaderCtrl', function($scope, UserService) {
 app.controller('UserCtrl', function($scope, $location, UserService) {
     $scope.signin = function(login) {
         UserService.signin(login.email, login.password);
+        //CartService.reloadCart();
         $location.path("home");
     };
     $scope.signup = function(signup) {
         UserService.signup(signup.email, signup.password, signup.name);
+        //CartService.reloadCart();
         $location.path("home");
     };
 });
 
-app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, ProductService, CartService) {
+app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
-    $scope.addToCart = function(product) {
+    $scope.user = UserService.user;
+    $scope.addToCart = function(product, quantity) {
+        product.quantity = quantity;
         CartService.addToCart(product);
+        $scope.quantity = undefined;
         $location.path("cart");
     };
-    $scope.addCategory = ProductService.AddCategory;
-    $scope.newCategory = undefined;
 
     if($stateParams.id !== undefined) {
         //$scope.product = $scope.products.$getRecord($stateParams.id);
@@ -77,22 +80,27 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             }, true)[0];
             //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
         });
-
+        $scope.addCategory = ProductService.AddCategory;
+        $scope.newCategory = undefined;
+        $scope.newReview = {};
+        $scope.addReview = function() {
+            ProductService.CreateReview($scope.product, $scope.newReview.title, $scope.newReview.rating, $scope.newReview.body);
+            $scope.newReview = {};
+        };
+        $scope.removeReview = ProductService.RemoveReview;
     }
 });
 
-app.controller('CartCtrl', function($scope, ProductService, CartService) {
+app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
+    UserService.requireLogin($location);
     $scope.cart = CartService.cart;
+    $scope.removeProduct = CartService.removeFromCart;
 
     $scope.process = function(cart) {
         if(cart !== undefined && cart !== null) {
-            var result = [];
             for(var i = 0; i < cart.length; i++) {
-                var product = ProductService.RetrieveProduct(cart[i].id);
-                product.quantity = cart[i].quantity;
-                result.push(product);
+                cart[i].product = ProductService.RetrieveProduct(cart[i].id);
             }
-            return result;
         }
         return cart;
     }
@@ -101,17 +109,27 @@ app.controller('CartCtrl', function($scope, ProductService, CartService) {
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
     console.log('logging user out');
     UserService.logout();
+    //CartService.reloadCart();
     $location.path("home");
 });
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
     $scope.products = ProductService.products;
-    //ProductService.CreateProduct('Apple Watch 2', 'Another watch from Apple', 400);
+    //ProductService.CreateProduct('Apple Watch 2', 'Another watch from Apple', 399);
 });
 
 app.factory('SystemService', function() {
     var service = {};
     service.ref = new Firebase("https://fire-store.firebaseio.com");
+    var callbacks = [];
+    service.addCall = function(call) {
+        callbacks.push(call);
+    };
+    service.execCalls = function() {
+        callbacks.forEach(function(call) {
+            call();
+        });
+    };
     return service;
 });
 
@@ -138,11 +156,10 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
                     service.user.name = name;
                 }
 
-                var newUserInfo = {
+                users[authData.uid] = {
                     'avatar': service.user.avatar,
                     'name': service.user.name
                 };
-                users[authData.uid] = newUserInfo;
 
                 users.$save();
 
@@ -171,22 +188,31 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
             users.$loaded(function() {
                 service.user.name = users[authData.uid].name;
                 service.user.avatar = users[authData.uid].avatar;
+                service.user.role = users[authData.uid].role;
             });
         } else {
             service.user.userId = undefined;
             service.user.name = undefined;
             service.user.avatar = undefined;
+            service.user.role = undefined;
         }
+        SystemService.execCalls();
     });
 
     service.isLoggedIn = function() {
         return service.user.userId !== undefined;
     };
 
+    service.requireLogin = function($location) {
+        if(!service.isLoggedIn()) {
+            $location.path("/user/login");
+        }
+    };
+
     return service;
 });
 
-app.factory('ProductService', function($firebaseArray, SystemService) {
+app.factory('ProductService', function($firebaseArray, SystemService, UserService) {
     var service = {};
     var productsRef = SystemService.ref.child('products');
     service.categories = [];
@@ -229,9 +255,17 @@ app.factory('ProductService', function($firebaseArray, SystemService) {
             title: title,
             rating: rating,
             body: body,
-            author: 'n/a'
+            author: UserService.user.userId || 'N/A'
         };
         productRef.reviews.push(review);
+        service.products.$save(productRef);
+    };
+
+    service.RemoveReview = function(product, review) {
+        var productRef = service.products.$getRecord(product.$id);
+        if(review.author === UserService.user.userId) {
+            productRef.reviews.splice(productRef.reviews.indexOf(review), 1);
+        }
         service.products.$save(productRef);
     };
 
@@ -259,13 +293,23 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     var carts = $firebaseObject(cartsRef);
 
     service.cart = {};
-    if(UserService.isLoggedIn()) {
-        carts.$loaded(function() {
-            service.cart.items = carts[UserService.user.userId].items || [];
-        });
-    } else {
-        service.cart.items = undefined;
-    }
+
+    service.reloadCart = function() {
+        if(UserService.isLoggedIn()) {
+            carts.$loaded(function() {
+                if(carts[UserService.user.userId]) {
+                    service.cart.items = carts[UserService.user.userId].items || [];
+                } else {
+                    service.cart.items = [];
+                }
+            });
+        } else {
+            service.cart.items = undefined;
+        }
+    };
+
+    service.reloadCart();
+    SystemService.addCall(service.reloadCart);
 
     service.addToCart = function(product) {
         var item = {};
@@ -276,19 +320,32 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
         } else {
             service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
         }
+        saveCart();
+    };
 
+    service.updateQuantity = function(product, quantity) {
+        product.quantity = quantity;
+        saveCart();
+    };
+
+    service.removeFromCart = function(product) {
+        service.cart.items.splice(indexOf(product, service.cart.items), 1);
+        saveCart();
+    };
+
+    function saveCart() {
         carts[UserService.user.userId] = service.cart;
         carts.$save();
+    }
 
-        function indexOf(o, arr) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i].id == o.id) {
-                    return i;
-                }
+    function indexOf(o, arr) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i].id == o.id) {
+                return i;
             }
-            return -1;
         }
-    };
+        return -1;
+    }
 
     return service;
 });

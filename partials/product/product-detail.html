@@ -1,14 +1,25 @@
 <h2>{{product.name}}</h2>
 <p>{{product.description}}</p>
-<h3>Reviews</h3>
-<div ng-repeat="review in product.reviews">
-    <h4>{{review.title}} - {{review.rating}}</h4>
-    <p>{{review.body}}</p>
+<form ng-if="user.userId">
+    <input type="number" ng-model="quantity" placeholder="Quantity"/>
+    <input type="submit" ng-click="addToCart(product, quantity)" value="Add to Cart" />
+</form>
+<div ng-show="product.reviews">
+    <h3>Reviews</h3>
+    <div ng-repeat="review in product.reviews">
+        <h4>{{review.title}} - {{review.rating}}</h4>
+        <p>{{review.body}} - By {{review.author}}</p>
+        <p ng-if="review.author === user.userId"><a ng-click="removeReview(product, review)">Remove</a></p>
+    </div>
 </div>
-<form>
+<form ng-if="user.userId">
+    <h4>Create Review</h4>
+    <input type="text" ng-model="newReview.title" placeholder="Title" />
+    <input type="number" ng-model="newReview.rating" placeholder="Rating" />
+    <textarea ng-model="newReview.body" placeholder="Review Text..."></textarea>
+    <input type="submit" ng-click="addReview()" value="Add Review" />
+</form>
+<form ng-if="user.role == 'admin'">
     <input type="text" placeholder="Category" ng-model="newCategory"/>
     <input type="submit" ng-click="addCategory(product, newCategory)" />
 </form>
-
-<input type="number" ng-model="product.quantity" />
-<input type="submit" ng-click="addToCart(product)" value="Add to Cart" />

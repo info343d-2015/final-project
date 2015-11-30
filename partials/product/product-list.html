@@ -3,8 +3,11 @@
         <td>Product Name</td>
         <td>Description</td>
         <td>Price</td>
+        <td></td>
     </tr>
     <tr ng-repeat="product in products">
         <td><a ui-sref="product-detail({id: product.stub})">{{ product.name }}</a></td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.price | currency }}</td>
     </tr>
 </table>
