@@ -35,6 +35,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/products/{id}',
             templateUrl: 'partials/product/product-detail.html',
             controller: 'ProductCtrl'
+        })
+        .state('cart', {
+            url: '/cart',
+            templateUrl: 'partials/cart/cart.html',
+            controller: 'CartCtrl'
         });
 
     $urlRouterProvider.otherwise('/');
@@ -55,9 +60,12 @@ app.controller('UserCtrl', function($scope, $location, UserService) {
     };
 });
 
-app.controller('ProductCtrl', function($scope, $stateParams, $filter, ProductService, CartService) {
+app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, ProductService, CartService) {
     $scope.products = ProductService.products;
-    $scope.addToCart = CartService.addToCart;
+    $scope.addToCart = function(product) {
+        CartService.addToCart(product);
+        $location.path("cart");
+    };
     $scope.addCategory = ProductService.AddCategory;
     $scope.newCategory = undefined;
 
@@ -70,6 +78,23 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, ProductSer
             //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
         });
 
+    }
+});
+
+app.controller('CartCtrl', function($scope, ProductService, CartService) {
+    $scope.cart = CartService.cart;
+
+    $scope.process = function(cart) {
+        if(cart !== undefined && cart !== null) {
+            var result = [];
+            for(var i = 0; i < cart.length; i++) {
+                var product = ProductService.RetrieveProduct(cart[i].id);
+                product.quantity = cart[i].quantity;
+                result.push(product);
+            }
+            return result;
+        }
+        return cart;
     }
 });
 
@@ -221,6 +246,10 @@ app.factory('ProductService', function($firebaseArray, SystemService) {
         service.products.$save(productRef);
     };
 
+    service.RetrieveProduct = function(id) {
+        return service.products.$getRecord(id);
+    };
+
     return service;
 });
 
@@ -229,18 +258,18 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     var cartsRef = SystemService.ref.child('carts');
     var carts = $firebaseObject(cartsRef);
 
+    service.cart = {};
     if(UserService.isLoggedIn()) {
-        service.cart = carts[UserService.user.userId];
-        if(!service.cart) {
-            service.cart = [];
-        }
+        carts.$loaded(function() {
+            service.cart.items = carts[UserService.user.userId].items || [];
+        });
     } else {
-        service.cart = undefined;
+        service.cart.items = undefined;
     }
 
-    var addtoCart = function(product) {
+    service.addToCart = function(product) {
         var item = {};
-        item.key = product.key();
+        item.id = product.$id;
         item.quantity = product.quantity;
         if(indexOf(item, service.cart.items) === -1) {
             service.cart.items.push(item);
@@ -248,9 +277,12 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
             service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
         }
 
+        carts[UserService.user.userId] = service.cart;
+        carts.$save();
+
         function indexOf(o, arr) {
             for (var i = 0; i < arr.length; i++) {
-                if (arr[i].key == o.key) {
+                if (arr[i].id == o.id) {
                     return i;
                 }
             }

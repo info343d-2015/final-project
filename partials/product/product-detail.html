@@ -9,3 +9,6 @@
     <input type="text" placeholder="Category" ng-model="newCategory"/>
     <input type="submit" ng-click="addCategory(product, newCategory)" />
 </form>
+
+<input type="number" ng-model="product.quantity" />
+<input type="submit" ng-click="addToCart(product)" value="Add to Cart" />
