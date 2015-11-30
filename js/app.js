@@ -65,6 +65,7 @@ app.controller('UserCtrl', function($scope, $location, UserService) {
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
+    $scope.getUser = UserService.getUser;
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
@@ -140,6 +141,10 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
 
     var users = $firebaseObject(usersRef);
     service.user = {};
+
+    service.getUser = function(id) {
+        return users[id];
+    };
 
     service.signup = function (email, password, name) {
         console.log("creating user " + email);
