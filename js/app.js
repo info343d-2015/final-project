@@ -63,6 +63,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, ProductSer
             $scope.product = $filter('filter')($scope.products, {
                 stub: $stateParams.id
             }, true)[0];
+            //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
         });
 
     }
@@ -70,11 +71,12 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, ProductSer
 
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
     UserService.logout();
-    $location.path( "/" );
+    $location.path("/");
 });
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
     $scope.products = ProductService.products;
+    //ProductService.CreateProduct('Apple Watch 2', 'Another watch from Apple', 400);
 });
 
 app.factory('SystemService', function() {
@@ -170,6 +172,22 @@ app.factory('ProductService', function($firebaseArray, SystemService) {
         obj.stock = 0;
         obj.stub = name.toLowerCase().replace(/ /g,"-");
         service.products.$add(obj);
+    };
+
+    service.CreateReview = function(product, title, rating, body) {
+        var productRef = service.products.$getRecord(product.$id);
+        if(productRef.reviews === undefined) {
+            productRef.reviews = [];
+        }
+        var review = {
+            title: title,
+            rating: rating,
+            body: body,
+            author: 'n/a'
+        };
+        productRef.reviews.push(review);
+        service.products.$save(productRef);
+        console.log(productRef);
     };
 
     service.CreateCategory = function(name, description) {
