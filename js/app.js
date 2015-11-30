@@ -203,6 +203,10 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
         return service.user.userId !== undefined;
     };
 
+    service.isAdmin = function() {
+        return service.user.role === 'admin';
+    };
+
     service.requireLogin = function($location) {
         if(!service.isLoggedIn()) {
             $location.path("/user/login");
@@ -263,7 +267,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
 
     service.RemoveReview = function(product, review) {
         var productRef = service.products.$getRecord(product.$id);
-        if(review.author === UserService.user.userId) {
+        if(review.author === UserService.user.userId || UserService.isAdmin()) {
             productRef.reviews.splice(productRef.reviews.indexOf(review), 1);
         }
         service.products.$save(productRef);

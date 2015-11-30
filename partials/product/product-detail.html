@@ -9,7 +9,7 @@
     <div ng-repeat="review in product.reviews">
         <h4>{{review.title}} - {{review.rating}}</h4>
         <p>{{review.body}} - By {{review.author}}</p>
-        <p ng-if="review.author === user.userId"><a ng-click="removeReview(product, review)">Remove</a></p>
+        <p ng-if="review.author === user.userId || user.role === 'admin'"><a ng-click="removeReview(product, review)">Remove</a></p>
     </div>
 </div>
 <form ng-if="user.userId">
