@@ -41,15 +41,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 });
 
 app.controller('HeaderCtrl', function($scope, UserService) {
-    $scope.name = UserService.user.name;
+    $scope.user = UserService.user;
 });
 
-app.controller('UserCtrl', function($scope, UserService) {
+app.controller('UserCtrl', function($scope, $location, UserService) {
     $scope.signin = function(login) {
         UserService.signin(login.email, login.password);
+        $location.path("home");
     };
     $scope.signup = function(signup) {
         UserService.signup(signup.email, signup.password, signup.name);
+        $location.path("home");
     };
 });
 
@@ -70,8 +72,9 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, ProductSer
 });
 
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
+    console.log('logging user out');
     UserService.logout();
-    $location.path("/");
+    $location.path("home");
 });
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
@@ -144,8 +147,6 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
             });
         } else {
             service.user.userId = undefined;
-            service.user.name = undefined;
-            service.user.avatar = undefined;
         }
     });
 
@@ -187,7 +188,6 @@ app.factory('ProductService', function($firebaseArray, SystemService) {
         };
         productRef.reviews.push(review);
         service.products.$save(productRef);
-        console.log(productRef);
     };
 
     service.CreateCategory = function(name, description) {
