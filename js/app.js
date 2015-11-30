@@ -66,6 +66,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
+    $scope.createProduct = UserService.CreateProduct;
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
@@ -114,8 +115,16 @@ app.controller('LogoutCtrl', function($scope, $location, UserService) {
     $location.path("home");
 });
 
-app.controller('HomeCtrl', function($scope, UserService, ProductService) {
+app.controller('HomeCtrl', function($scope, $location, UserService, ProductService, CartService) {
     $scope.products = ProductService.products;
+    $scope.user = UserService.user;
+    $scope.createProduct = UserService.CreateProduct;
+    $scope.addToCart = function(product, quantity) {
+        product.quantity = quantity;
+        CartService.addToCart(product);
+        $scope.quantity = undefined;
+        $location.path("cart");
+    };
     //ProductService.CreateProduct('Apple Watch 2', 'Another watch from Apple', 399);
 });
 

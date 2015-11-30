@@ -19,7 +19,7 @@
     <textarea ng-model="newReview.body" placeholder="Review Text..."></textarea>
     <input type="submit" ng-click="addReview()" value="Add Review" />
 </form>
-<form ng-if="user.role == 'admin'">
+<form ng-if="user.role === 'admin'">
     <input type="text" placeholder="Category" ng-model="newCategory"/>
     <input type="submit" ng-click="addCategory(product, newCategory)" />
 </form>

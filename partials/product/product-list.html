@@ -9,5 +9,15 @@
         <td><a ui-sref="product-detail({id: product.stub})">{{ product.name }}</a></td>
         <td>{{ product.description }}</td>
         <td>{{ product.price | currency }}</td>
+        <td><a ng-if="user.userId" ng-click="addToCart(product, 1)">Add to Cart</a></td>
     </tr>
 </table>
+<div ng-if="user.role === 'admin'">
+    <h3>Create Product</h3>
+    <form>
+        <input type="text" ng-model="product.name" placeholder="Name" />
+        <textarea ng-model="product.description" placeholder="Description"></textarea>
+        <input type="number" ng-model="product.price" placeholder="Price"/>
+        <input type="submit" ng-click="createProduct(product.name, product.description, product.price)" value="Create Product"/>
+    </form>
+</div>
