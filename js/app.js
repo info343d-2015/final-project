@@ -80,6 +80,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             $scope.product = $filter('filter')($scope.products, {
                 stub: $stateParams.id
             }, true)[0];
+            console.log($scope.product);
             //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
         });
         $scope.addCategory = ProductService.AddCategory;
@@ -263,6 +264,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
         obj.price = price;
         obj.reviews = [];
         obj.stock = 0;
+        obj.image = "img/placeholder.jpg";
         obj.stub = name.toLowerCase().replace(/ /g,"-");
         service.products.$add(obj);
     };
