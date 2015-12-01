@@ -128,6 +128,10 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
     //ProductService.CreateProduct('Apple Watch 2', 'Another watch from Apple', 399);
 });
 
+app.controller('SignInCtrl', ['$scope', '$uiModalInstance', 'UserService', function ($scope, $uiModalInstance, UserService) {
+
+}]);
+
 app.factory('SystemService', function() {
     var service = {};
     service.ref = new Firebase("https://fire-store.firebaseio.com");
