@@ -30,12 +30,13 @@
                   <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
                 </form>
                 <ul id="user-status" class="nav navbar-nav navbar-right">
-                    <!-- if user is signed in-->
-                    <li>Hello, {{ name }}</li>
-                    <!-- else -->
-                    <li><button type="submit" class="btn btn-default navbar-btn">Sign In</button></li>
                     <!-- Only show if they are signed in-->
-                    <li><a ui-sref="account">Profile</a></li>
+                    <li ng-show='name'>Hello, {{ name }}</li>
+                    <!-- Only show if they are NOT signed in-->
+                    <li ng-show='!signedIn'><button type="submit" class="btn btn-default navbar-btn">Sign In</button></li>
+                    <!-- Only show if they are signed in-->
+                    <li ng-show="signedIn"><a ui-sref="account">Profile</a></li>
+                    <!-- This will always show. -->
                     <li><a ui-sref="cart"><i class="fa fa-shopping-cart fa-lg"></a></i>
                 </ul>
             </div>

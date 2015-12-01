@@ -16,13 +16,26 @@ app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HeaderCtrl', function($scope, UserService) {
+app.controller('HeaderCtrl', ['$scope', '$http', '$uiModal', 'UserService', function ($scope, $http, $uiModal, UserService) {
     $scope.name = UserService.user.name;
-});
+    $scope.signedIin = UserService.user.name;
+
+    $scope.signIn = function() {
+        var modalInstance = $uiModal.open({
+            templateUrl: 'partials/signIn.html',
+            controller: 'SignInCtrl',
+            scope: $scope
+        });
+    };
+}]);
 
 app.controller('HomeCtrl', function($scope, UserService, ProductService) {
-    
+
 });
+
+app.controller('SignInCtrl', ['$scope', '$uiModalInstance', 'UserService', function ($scope, $uiModalInstance, UserService) {
+
+}]);
 
 app.factory('SystemService', function() {
     var service = {};
