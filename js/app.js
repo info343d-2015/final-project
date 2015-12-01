@@ -111,7 +111,6 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
     console.log('logging user out');
     UserService.logout();
-    //CartService.reloadCart();
     $location.path("home");
 });
 
