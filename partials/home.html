@@ -39,10 +39,12 @@
 
 <div class="container recommendations">
 	<h2>Recommendations</h2>
-	<!-- This div will be repeated for all recommendations -->
-	<div class="recommended-product col-xs-12 col-sm-4 col-md-3 col-lg-3">
-		<img class="product-img" src="http://www.vetprofessionals.com/catprofessional/images/home-cat.jpg">
-		<h3 class="product-title">Cat</h3>
-		<p class="product-short-desc">This is a mighty fine cat. It comes in many colors.</p>
-	</div>
+  <div class='row'>
+  	<div class='product recommended-product col-xs-12 col-sm-4 col-md-3 col-lg-3' ng-repeat='product in products'> <!-- We want to finter on the product catagory that user set.-->
+  		<img class='product-img' src='http://www.vetprofessionals.com/catprofessional/images/home-cat.jpg'>
+  		<h3 class='product-title'>{{product.name}}</h3>
+      <h4 class='product-price'>{{product.price | currency }}</h4>
+      <button class="btn btn-primary quick-btn" ng-click="popup(product.stub)">Quick View</button>
+  	</div>
+  </div>
 </div>
