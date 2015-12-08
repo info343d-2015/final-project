@@ -110,6 +110,7 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
     console.log('logging user out');
     UserService.logout();
+    $location.path('home'); //TODO: Redirect to pre-existing page
 });
 
 app.controller('HomeCtrl', function($scope, $location, UserService, ProductService, CartService) {
