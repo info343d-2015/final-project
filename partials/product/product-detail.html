@@ -5,7 +5,7 @@
         </div>
         <div class="col-md-8 details-right">
             <h2>{{product.name}}</h2>
-            <div ng-raty="ratyOptions" ng-model="avgRating"></div>
+            <div ng-if="avgRating != -1" ng-model="avgRating" ng-raty="ratyOptions" ></div>
             <ul class="details-list">
                 <li class="price">{{product.price | currency}}</li>
                 <li>{{product.stock}} in stock</li>
@@ -46,14 +46,15 @@
         </form>
     </div>  
 
-    <div class="row" ng-show="product.reviews">
+    <div class="row">
         <h3>Reviews</h3>
-        <div ng-repeat="review in product.reviews.slice().reverse()">
+        <div ng-show="product.reviews" ng-repeat="review in product.reviews.slice().reverse()">
             <h4>{{review.title}}</h4>
             <div ng-raty="ratyOptions" ng-model="review.rating"></div>
             <p>{{review.body}} - By {{getUser(review.author).name}}</p>
             <p ng-if="review.author === user.userId || user.role === 'admin'"><a ng-click="removeReview(product, review)">Remove</a></p>
         </div>
+        <p ng-show="!product.reviews">No reviews found</p>
     </div>
     
 </div>

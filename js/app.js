@@ -82,6 +82,22 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         $location.path("cart");
     };
 
+    $scope.ratyOptions = {
+        half: false,
+        cancel: false,
+        readOnly: true,
+        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
+        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
+    };
+
+    $scope.ratyNewOptions = {
+        half: false,
+        cancel: false,
+        readOnly: false,
+        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
+        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
+    };
+    $scope.avgRating = -1;
 
     if($stateParams.id !== undefined) {
         //$scope.product = $scope.products.$getRecord($stateParams.id);
@@ -91,10 +107,17 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             }, true)[0];
             console.log($scope.product);
             var sum = 0;
-            for(var i = 0; i < $scope.product.reviews.length; i++) {
-                sum += $scope.product.reviews[i].rating;
+            if($scope.product.reviews) {
+                for(var i = 0; i < $scope.product.reviews.length; i++) {
+                    sum += $scope.product.reviews[i].rating;
+                }
+                $scope.avgRating = Math.round(sum / $scope.product.reviews.length);
+            } else {
+                $scope.avgRating = 0;
             }
-            $scope.avgRating = Math.round(sum / $scope.product.reviews.length);
+            
+            
+            console.log($scope.avgRating);
             //prototype array function
             
             //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
@@ -119,21 +142,8 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             });
     }
 
-    $scope.ratyOptions = {
-        half: false,
-        cancel: false,
-        readOnly: true,
-        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
-        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
-    };
 
-    $scope.ratyNewOptions = {
-        half: false,
-        cancel: false,
-        readOnly: false,
-        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
-        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
-    };
+
 });
 
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
