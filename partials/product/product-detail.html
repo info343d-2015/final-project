@@ -1,14 +1,15 @@
 <div class="details-main">
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 details-left">
             <img class="primary-img" src="img/placeholder.jpg">
         </div>
-        <div class="col-md-8 details-left">
+        <div class="col-md-8 details-right">
             <h2>{{product.name}}</h2>
+            <div ng-if="avgRating != -1" ng-model="avgRating" ng-raty="ratyOptions" ></div>
             <ul class="details-list">
                 <li class="price">{{product.price | currency}}</li>
                 <li>{{product.stock}} in stock</li>
-                <li>Sold by (manufacturer/seller here)</li>
+                <li>Sold by {{product.manufacturer}}</li>
             </ul>
             <p>{{product.description}}</p>
 
@@ -19,25 +20,41 @@
         </div>
     </div>
 
-        
+    <div class="row" ng-if="user.userId">
+        <form>
+            <h3>Create Review</h3>
+            <div class="form-group">
+                 <div ng-raty="ratyNewOptions" ng-model="newReview.rating"></div>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" ng-model="newReview.title" placeholder="Title" />
+            </div>
+            <div class="form-group">
+                <textarea class="form-control" ng-model="newReview.body" placeholder="Review Text..."></textarea>
+            </div>    
+            <div class="form-group">
+                <input type="submit" class="btn btn-default" ng-click="addReview()" value="Add Review" />
+            </div>
+        </form>
+        <form ng-if="user.role === 'admin'">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Category" ng-model="newCategory"/>
+            </div>
+            <div class="form-group">    
+                <input type="submit" class="btn btn-default" ng-click="addCategory(product, newCategory)" />
+            </div>
+        </form>
+    </div>  
 
-    <div class="row" ng-show="product.reviews">
+    <div class="row">
         <h3>Reviews</h3>
-        <div ng-repeat="review in product.reviews">
-            <h4>{{review.title}} - {{review.rating}}</h4>
+        <div ng-show="product.reviews" ng-repeat="review in product.reviews.slice().reverse()">
+            <h4>{{review.title}}</h4>
+            <div ng-raty="ratyOptions" ng-model="review.rating"></div>
             <p>{{review.body}} - By {{getUser(review.author).name}}</p>
             <p ng-if="review.author === user.userId || user.role === 'admin'"><a ng-click="removeReview(product, review)">Remove</a></p>
         </div>
+        <p ng-show="!product.reviews">No reviews found</p>
     </div>
-    <form ng-if="user.userId">
-        <h4>Create Review</h4>
-        <input type="text" ng-model="newReview.title" placeholder="Title" />
-        <input type="number" ng-model="newReview.rating" placeholder="Rating" />
-        <textarea ng-model="newReview.body" placeholder="Review Text..."></textarea>
-        <input type="submit" ng-click="addReview()" value="Add Review" />
-    </form>
-    <form ng-if="user.role === 'admin'">
-        <input type="text" placeholder="Category" ng-model="newCategory"/>
-        <input type="submit" ng-click="addCategory(product, newCategory)" />
-    </form>
+    
 </div>

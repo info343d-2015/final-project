@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase']);
+var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
@@ -41,22 +41,8 @@ app.controller('HeaderCtrl', function($scope, UserService, $uibModal) {
     $scope.signIn = function() {
         var modalInstance = $uibModal.open({
             templateUrl: 'partials/user/login.html',
-            controller: 'LoginCtrl',
-            scope: $scope
+            controller: 'LoginCtrl'
         });
-    };
-});
-
-app.controller('UserCtrl', function($scope, $location, UserService) {
-    $scope.signin = function(login) {
-        UserService.signin(login.email, login.password);
-        //CartService.reloadCart();
-        $location.path("home");
-    };
-    $scope.signup = function(signup) {
-        UserService.signup(signup.email, signup.password, signup.name);
-        //CartService.reloadCart();
-        $location.path("home");
     };
 });
 
@@ -94,6 +80,23 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         $location.path("cart");
     };
 
+    $scope.ratyOptions = {
+        half: false,
+        cancel: false,
+        readOnly: true,
+        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
+        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
+    };
+
+    $scope.ratyNewOptions = {
+        half: false,
+        cancel: false,
+        readOnly: false,
+        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
+        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
+    };
+    $scope.avgRating = -1;
+
     if($stateParams.id !== undefined) {
         //$scope.product = $scope.products.$getRecord($stateParams.id);
         $scope.products.$loaded(function() {
@@ -101,6 +104,20 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                 stub: $stateParams.id
             }, true)[0];
             console.log($scope.product);
+            var sum = 0;
+            if($scope.product.reviews) {
+                for(var i = 0; i < $scope.product.reviews.length; i++) {
+                    sum += $scope.product.reviews[i].rating;
+                }
+                $scope.avgRating = Math.round(sum / $scope.product.reviews.length);
+            } else {
+                $scope.avgRating = 0;
+            }
+            
+            
+            console.log($scope.avgRating);
+            //prototype array function
+            
             //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
         });
         $scope.addCategory = ProductService.AddCategory;
@@ -118,10 +135,11 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                templateUrl: 'partials/product/product_modal.html',
                controller: 'ProductModal',
                params: {
-                    id: stub,
+                    id: stub
                 }
             });
     }
+
 });
 
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
@@ -155,7 +173,6 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
         $scope.quantity = undefined;
         $location.path("cart");
     };
-    //ProductService.CreateProduct('Apple Watch 2', 'Another watch from Apple', 399);
 });
 
 app.controller('LoginCtrl', function($scope, $uibModalInstance, UserService, $uibModal) {
@@ -172,7 +189,7 @@ app.controller('LoginCtrl', function($scope, $uibModalInstance, UserService, $ui
     $scope.goToSignUp = function() {
         $uibModalInstance.close();
         var modalInstance = $uibModal.open({
-            templateUrl: '/partials/user/signup.html',
+            templateUrl: 'partials/user/signup.html',
             controller: 'SignUpCtrl'
         });
     };
@@ -183,7 +200,7 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, UserService) {
             console.log('got here');
 
     $scope.createAccount = function (signup) {
-        UserService.signup(signup.email, signup.password, signup.name);
+        UserService.signup(signup);
         $uibModalInstance.close();
     };
 
@@ -220,24 +237,29 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
         return users[id];
     };
 
-    service.signup = function (email, password, name) {
-        console.log("creating user " + email);
+    service.signup = function (user) {
+        console.log("creating user " + user.email);
 
         Auth.$createUser({
-                'email': email,
-                'password': password
+                'email': user.email,
+                'password': user.password
             })
-            .then(service.signin(email, password)).then(function (authData) {
+            .then(service.signin(user.email, user.password)).then(function (authData) {
                 if (!service.user.avatar) {
                     service.user.avatar = "img/no-pic.png";
                 }
                 if (!service.user.name) {
-                    service.user.name = name;
+                    service.user.name = user.name;
+                }
+
+                if (!service.user.recPref) {
+                    service.user.recPref = user.recPref;
                 }
 
                 users[authData.uid] = {
                     'avatar': service.user.avatar,
-                    'name': service.user.name
+                    'name': service.user.name,
+                    'recPref': service.user.recPref
                 };
 
                 users.$save();
