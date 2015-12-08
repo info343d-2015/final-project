@@ -47,11 +47,11 @@ app.controller('HeaderCtrl', function($scope, UserService, $uibModal) {
 });
 
 //controller for the modal to make quick view pop up
-app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService) {
+app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService, ProdId) {
     $scope.products = ProductService.products;
     $scope.products.$loaded(function() {
             $scope.product = $filter('filter')($scope.products, {
-                stub: $stateParams.id
+                stub: ProdId
             }, true)[0];
         });
     $scope.addcartmod = function(product) {
@@ -134,9 +134,11 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         var modalInstance = $uibModal.open({
                templateUrl: 'partials/product/product_modal.html',
                controller: 'ProductModal',
-               params: {
-                    id: stub
-                }
+               resolve: {
+                   ProdId : function() {
+                       return stub;
+                   }
+               }
             });
     }
 
@@ -225,7 +227,7 @@ app.factory('SystemService', function() {
     return service;
 });
 
-app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemService) {
+app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, SystemService) {
     var service = {};
     var Auth = $firebaseAuth(SystemService.ref);
     var usersRef = SystemService.ref.child('users');
@@ -308,7 +310,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, SystemServic
         return service.user.role === 'admin';
     };
 
-    service.requireLogin = function($location) {
+    service.requireLogin = function() {
         if(!service.isLoggedIn()) {
             $location.path("/user/login");
         }
