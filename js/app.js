@@ -389,7 +389,7 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
             });
 
         } else {
-            service.cart.items = []; //NOTE: CHANGED THIS TO EMPTY ARRAY IN ORDER TO GET ADDTOCART METHOD FOR SANCHYA WORKING
+            service.cart.items = undefined; 
         }
     };
 
