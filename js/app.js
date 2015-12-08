@@ -68,6 +68,12 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
                 stub: $stateParams.id
             }, true)[0];
         });
+    $scope.addToCart = function(product, quantity) {
+        product.quantity = quantity;
+        CartService.addToCart(product);
+        $scope.quantity = undefined;
+        $location.path("cart");
+    };
 });
 
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
@@ -75,11 +81,12 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
     $scope.createProduct = UserService.CreateProduct;
-    $scope.addToCart = function(product, quantity) {
-        product.quantity = quantity;
+    //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
+    $scope.addcartmod = function(product) {
+        // product.quantity = quantity;
         CartService.addToCart(product);
-        $scope.quantity = undefined;
-        $location.path("cart");
+        // $scope.quantity = undefined;
+        // $location.path("cart");
     };
 
     if($stateParams.id !== undefined) {
