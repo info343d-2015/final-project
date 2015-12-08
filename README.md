@@ -7,3 +7,17 @@ To run the tools in the background, use the following commands from the root dir
  -  All background tools (includes all other tools) - `tools/run.sh`
  -  Web Server - `tools/webserver.sh`
  -  SASS Watcher - `tools/sass.sh`
+ -  
+ 
+### Colors:
+orange: #fc8e18
+ use this for outlines and titles
+
+black: #1d2021
+ use this for the background and the text on the modal
+ 
+dark-grey: #596269
+ use this for the background of the modals
+ 
+light-grey: #bcc0c3
+ use this for the text on the normal pages and the the buttons
