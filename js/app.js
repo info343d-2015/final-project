@@ -47,13 +47,24 @@ app.controller('HeaderCtrl', function($scope, UserService, $uibModal) {
 });
 
 //controller for the modal to make quick view pop up
-app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, ProductService, UserService, CartService) {
+app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.products.$loaded(function() {
             $scope.product = $filter('filter')($scope.products, {
                 stub: $stateParams.id
             }, true)[0];
         });
+    $scope.addcartmod = function(product) {
+        product.quantity = 1;
+        CartService.addToCart(product);
+        console.log(product.name);
+        $uibModalInstance.close();
+        //$scope.quantity = undefined;
+        //$location.path("cart");
+    };
+    $scope.closemod = function(){
+        $uibModalInstance.close();
+    }
 });
 
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
@@ -61,6 +72,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
     $scope.createProduct = UserService.CreateProduct;
+    //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
@@ -397,8 +409,9 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
                     service.cart.items = [];
                 }
             });
+
         } else {
-            service.cart.items = undefined;
+            service.cart.items = undefined; 
         }
     };
 
