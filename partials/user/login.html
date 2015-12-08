@@ -1,15 +1,15 @@
 <div class='modal-body'>
-	<form>
-		<div class='form-group'>
+	<form name='signIn' novalidate>
+		<div class='form-group' ng-class="{'has-error': signIn.email.$invalid && signIn.email.$touched}">
 			<label for='emailInput'>Email</label>
-	    	<input type="email" ng-model="user.email" placeholder="Email" id='emailInput' class='form-control' />
+	    	<input type="email" name='email' ng-model="user.email" placeholder="Email" id='emailInput' class='form-control' required />
 	    </div>
-	    <div class='form-group'>
+	    <div class='form-group' ng-class="{'has-error': signIn.password.$invalid && signIn.password.$touched}">
 	    	<label for='passwordInput'>Password</label>
-	    	<input type="password" ng-model="user.password" placeholder="Password" id='passwordInput' class='form-control' />
+	    	<input type="password" name='password' ng-model="user.password" placeholder="Password" id='passwordInput' class='form-control' required />
 	    </div>
 	    <a ng-click='goToSignUp()'>Don't have an account. Sign up here.</a><br />
-		<button class='btn btn-default' type='submit' ng-click='signin(user)'>Sign In</button>
+		<button class='btn btn-default' type='submit' ng-click='signin(user)' ng-disabled='signIn.$invalid'>Sign In</button>
 		<button class='btn btn-default' type='submit' ng-click='close()'>Cancel</button>
 	</form>
 </div>
