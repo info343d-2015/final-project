@@ -20,7 +20,7 @@
     <div class = "row">
         <div class = "col-md-4" ng-repeat = "product in products">
             <p><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a>
-            <p>{{product.description}}</p>
+            <!--<p>{{product.description}}</p>-->
             <p>{{product.price | currency }}</p>
             <p>{{product.categories[0]}}</p> 
             <button class="btn btn-primary" ng-click="popup(product.stub)">Quick View</button>

@@ -61,19 +61,24 @@ app.controller('UserCtrl', function($scope, $location, UserService) {
 });
 
 //controller for the modal to make quick view pop up
-app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, ProductService, UserService, CartService) {
+app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.products.$loaded(function() {
             $scope.product = $filter('filter')($scope.products, {
                 stub: $stateParams.id
             }, true)[0];
         });
-    $scope.addToCart = function(product, quantity) {
-        product.quantity = quantity;
+    $scope.addcartmod = function(product) {
+        product.quantity = 1;
         CartService.addToCart(product);
-        $scope.quantity = undefined;
-        $location.path("cart");
+        console.log(product.name);
+        $uibModalInstance.close();
+        //$scope.quantity = undefined;
+        //$location.path("cart");
     };
+    $scope.closemod = function(){
+        $uibModalInstance.close();
+    }
 });
 
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
@@ -82,11 +87,11 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     $scope.getUser = UserService.getUser;
     $scope.createProduct = UserService.CreateProduct;
     //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
-    $scope.addcartmod = function(product) {
-        // product.quantity = quantity;
+    $scope.addToCart = function(product, quantity) {
+        product.quantity = quantity;
         CartService.addToCart(product);
-        // $scope.quantity = undefined;
-        // $location.path("cart");
+        $scope.quantity = undefined;
+        $location.path("cart");
     };
 
     if($stateParams.id !== undefined) {
@@ -382,8 +387,9 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
                     service.cart.items = [];
                 }
             });
+
         } else {
-            service.cart.items = undefined;
+            service.cart.items = []; //NOTE: CHANGED THIS TO EMPTY ARRAY IN ORDER TO GET ADDTOCART METHOD FOR SANCHYA WORKING
         }
     };
 
