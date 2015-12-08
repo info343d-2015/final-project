@@ -1,4 +1,4 @@
-<table>
+<!--<table>
     <tr>
         <td>Product Name</td>
         <td>Description</td>
@@ -14,10 +14,17 @@
 </table>
 <div ng-if="user.role === 'admin'">
     <h3>Create Product</h3>
-    <form>
-        <input type="text" ng-model="product.name" placeholder="Name" />
-        <textarea ng-model="product.description" placeholder="Description"></textarea>
-        <input type="number" ng-model="product.price" placeholder="Price"/>
-        <input type="submit" ng-click="createProduct(product.name, product.description, product.price)" value="Create Product"/>
-    </form>
+</div>-->
+
+<div class = "container">
+    <div class = "row">
+        <div class = "col-md-4" ng-repeat = "product in products">
+            <p><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a>
+            <p>{{product.name}}</p>
+            <p>{{product.description}}</p>
+            <p>{{product.price | currency }}</p>
+            <p>{{product.categories[0]}}</p> <!--DOESN'T WORK -->
+            <button class="btn btn-primary" ng-click="popup(product.stub)">Quick View</button>
+        </div>
+    </div>
 </div>
