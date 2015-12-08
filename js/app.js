@@ -60,7 +60,17 @@ app.controller('UserCtrl', function($scope, $location, UserService) {
     };
 });
 
-app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, ProductService, UserService, CartService) {
+//controller for the modal to make quick view pop up
+app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, ProductService, UserService, CartService) {
+    $scope.products = ProductService.products;
+    $scope.products.$loaded(function() {
+            $scope.product = $filter('filter')($scope.products, {
+                stub: $stateParams.id
+            }, true)[0];
+        });
+});
+
+app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
@@ -89,6 +99,16 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             $scope.newReview = {};
         };
         $scope.removeReview = ProductService.RemoveReview;
+
+    }
+    $scope.popup = function(stub){
+        var modalInstance = $uibModal.open({
+               templateUrl: 'partials/product/product_modal.html',
+               controller: 'ProductModal',
+               params: {
+                    id: stub,
+                }
+            });
     }
 });
 
@@ -159,6 +179,7 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, UserService) {
         $uibModalInstance.close();
     }
 });
+
 
 app.factory('SystemService', function() {
     var service = {};
