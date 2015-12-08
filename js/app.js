@@ -82,6 +82,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         $location.path("cart");
     };
 
+
     if($stateParams.id !== undefined) {
         //$scope.product = $scope.products.$getRecord($stateParams.id);
         $scope.products.$loaded(function() {
@@ -89,6 +90,13 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                 stub: $stateParams.id
             }, true)[0];
             console.log($scope.product);
+            var sum = 0;
+            for(var i = 0; i < $scope.product.reviews.length; i++) {
+                sum += $scope.product.reviews[i].rating;
+            }
+            $scope.avgRating = Math.round(sum / $scope.product.reviews.length);
+            //prototype array function
+            
             //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
         });
         $scope.addCategory = ProductService.AddCategory;
@@ -111,9 +119,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             });
     }
 
-    $scope.tempRating = 4;
-
-    $scope.ratyAvgOptions = {
+    $scope.ratyOptions = {
         half: false,
         cancel: false,
         readOnly: true,

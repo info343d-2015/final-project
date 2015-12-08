@@ -121,9 +121,14 @@ h3.product-title {
 
   .primary-img {
     width: 100%;
+
   }
 
   .details-left {
+    padding-left: 0px;
+  }
+
+  .details-right {
     padding-left: 2%;
   }
 
