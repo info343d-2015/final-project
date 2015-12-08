@@ -30,6 +30,21 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/cart',
             templateUrl: 'partials/cart/cart.html',
             controller: 'CartCtrl'
+        })
+        .state('payment', {
+            url: '/cart/payment',
+            templateUrl: 'partials/checkout/payment.html',
+            controller: 'PaymentCtrl'
+        })
+        .state('address', {
+            url: '/cart/shipping-address',
+            templateUrl: 'partials/checkout/address.html',
+            controller: 'AddressCtrl'
+        })
+        .state('complete', {
+            url: '/cart/checkout-complete',
+            templateUrl: 'partials/checkout/checkout-complete.html',
+            controller: 'CompleteCtrl'
         });
 
     $urlRouterProvider.otherwise('/');
@@ -207,6 +222,18 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, UserService) {
     $scope.close = function() {
         $uibModalInstance.close();
     }
+});
+
+app.controller('AddressCtrl', function($scope, UserService) {
+
+});
+
+app.controller('PaymentCtrl', function($scope, UserService) {
+
+});
+
+app.controller('CompleteCtrl', function($scope, UserService) {
+
 });
 
 
