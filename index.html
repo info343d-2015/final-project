@@ -38,8 +38,6 @@
                     <!-- Only show if they are NOT signed in-->
                     <li ng-show='!user.userId'><button type="submit" class="btn btn-default navbar-btn" ng-click='signIn()'>Sign In</button></li>
                     <li ng-show='user.userId'><a ui-sref='logout'><button type='submit' class='btn btn-default navbar-btn'>Sign Out</button></a></li>
-                    <!-- Only show if they are signed in-->
-                    <li ng-show="user.userId"><a ui-sref="account">Profile</a></li>
                     <!-- This will always show. -->
                     <li><a ui-sref="cart"><i class="fa fa-shopping-cart fa-lg"></a></i>
                 </ul>
@@ -47,6 +45,11 @@
         </div>
     </nav>
     <div class="container-fluid" ui-view></div>
+
+    <footer>
+        <p>This is a product that was created by Sanchya, Ali, Dakota, and Brandyn for the INFO 343 Final Project.</p>
+    </footer>   
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
     <script src="//cdn.firebase.com/js/client/2.2.4/firebase.js"></script>

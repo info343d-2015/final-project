@@ -10,7 +10,7 @@ To run the tools in the background, use the following commands from the root dir
  -  
  
 ### Colors:
-orange: #fc8e18
+orange: #fc8e18 -- shaded: #BA6306
  use this for outlines and titles
 
 black: #1d2021
