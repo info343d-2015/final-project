@@ -17,12 +17,20 @@ body {
   color: #fc8e18;
 }
 
+.fa-shopping-cart:hover, .navbar-default .navbar-brand:hover {
+  color: #CF6F08;
+}
+
 .fa-search {
   color: #444;
 }
 
 .navbar-btn, .navbar-button {
   background-color: #fc8e18;
+}
+
+.navbar-btn:hover, .navbar-button:hover {
+  background-color: #CF6F08;
 }
 
 /*
