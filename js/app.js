@@ -12,19 +12,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/user/account',
             templateUrl: 'partials/user/account.html'
         })
-        .state('login', {
-            url: '/user/login',
-            templateUrl: 'partials/user/login.html',
-            controller: 'UserCtrl'
-        })
         .state('logout', {
             url: '/user/logout',
             controller: 'LogoutCtrl'
-        })
-        .state('signup', {
-            url: '/user/signup',
-            templateUrl: 'partials/user/signup.html',
-            controller: 'UserCtrl'
         })
         .state('product-list', {
             url: '/products',
@@ -45,8 +35,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HeaderCtrl', function($scope, UserService) {
+app.controller('HeaderCtrl', function($scope, UserService, $uibModal) {
     $scope.user = UserService.user;
+
+    $scope.signIn = function() {
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/user/login.html',
+            controller: 'LoginCtrl',
+            scope: $scope
+        });
+    };
 });
 
 app.controller('UserCtrl', function($scope, $location, UserService) {
@@ -112,7 +110,6 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
     console.log('logging user out');
     UserService.logout();
-    $location.path("home");
 });
 
 app.controller('HomeCtrl', function($scope, $location, UserService, ProductService, CartService) {
@@ -128,9 +125,39 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
     //ProductService.CreateProduct('Apple Watch 2', 'Another watch from Apple', 399);
 });
 
-app.controller('SignInCtrl', ['$scope', '$uiModalInstance', 'UserService', function ($scope, $uiModalInstance, UserService) {
+app.controller('LoginCtrl', function($scope, $uibModalInstance, UserService, $uibModal) {
 
-}]);
+    $scope.signin = function(login) {
+        UserService.signin(login.email, login.password);
+        $uibModalInstance.close();
+    };
+
+    $scope.close = function() {
+        $uibModalInstance.close();
+    };
+
+    $scope.goToSignUp = function() {
+        $uibModalInstance.close();
+        var modalInstance = $uibModal.open({
+            templateUrl: '/partials/user/signup.html',
+            controller: 'SignUpCtrl'
+        });
+    };
+
+});
+
+app.controller('SignUpCtrl', function($scope, $uibModalInstance, UserService) {
+            console.log('got here');
+
+    $scope.createAccount = function (signup) {
+        UserService.signup(signup.email, signup.password, signup.name);
+        $uibModalInstance.close();
+    };
+
+    $scope.close = function() {
+        $uibModalInstance.close();
+    }
+});
 
 app.factory('SystemService', function() {
     var service = {};
