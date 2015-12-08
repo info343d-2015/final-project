@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase']);
+var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
@@ -110,6 +110,24 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                 }
             });
     }
+
+    $scope.tempRating = 4;
+
+    $scope.ratyAvgOptions = {
+        half: false,
+        cancel: false,
+        readOnly: true,
+        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
+        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
+    };
+
+    $scope.ratyNewOptions = {
+        half: false,
+        cancel: false,
+        readOnly: false,
+        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
+        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
+    };
 });
 
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
