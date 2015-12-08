@@ -12,7 +12,7 @@
 			<th>price</th>
 			<th>quantity</th>
 		</tr>
-		<tr ng-repeat = "item in process(cart.items)">
+		<tr ng-repeat = "item in process(cart)">
 			<td>{{item.product.name}}</td>
 			<td>{{item.product.price|currency}} </td>
 			<td>{{item.product.quantity}}</td>

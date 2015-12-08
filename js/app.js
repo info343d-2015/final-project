@@ -48,11 +48,21 @@ app.controller('HeaderCtrl', function($scope, UserService, $uibModal) {
 
 //controller for the modal to make quick view pop up
 app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService, ProdId) {
+    $scope.avgRating = -1;
     $scope.products = ProductService.products;
     $scope.products.$loaded(function() {
             $scope.product = $filter('filter')($scope.products, {
                 stub: ProdId
             }, true)[0];
+            var sum = 0;
+            if($scope.product.reviews) {
+                for(var i = 0; i < $scope.product.reviews.length; i++) {
+                    sum += $scope.product.reviews[i].rating;
+                }
+                $scope.avgRating = Math.round(sum / $scope.product.reviews.length);
+            } else {
+                $scope.avgRating = 0;
+            }
         });
     $scope.addcartmod = function(product) {
         product.quantity = 1;
@@ -65,6 +75,13 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
     $scope.closemod = function(){
         $uibModalInstance.close();
     }
+    $scope.ratyOptions = {
+        half: false,
+        cancel: false,
+        readOnly: true,
+        starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
+        starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
+    };
 });
 
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {

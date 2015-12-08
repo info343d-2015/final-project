@@ -3,7 +3,7 @@
 	<!--ADD IMAGE IN HERE -->
 	<p>{{product.description}}</p>
 	<p>{{product.price | currency }}</p>
-	<div ng-raty="ratyOptions" ng-model="avgRating"></div>
+	<div ng-raty="ratyOptions" ng-model="avgRating" ng-if="avgRating!=-1"></div>
 
 		 <button class="btn btn-primary" ng-click="addcartmod(product)">AddToCart</button>
 		 <button class="btn btn-primary" ng-click="closemod()">Close Quick View</button>
