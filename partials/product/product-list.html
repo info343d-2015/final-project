@@ -1,26 +1,7 @@
-<!--<table>
-    <tr>
-        <td>Product Name</td>
-        <td>Description</td>
-        <td>Price</td>
-        <td></td>
-    </tr>
-    <tr ng-repeat="product in products">
-        <td><a ui-sref="product-detail({id: product.stub})">{{ product.name }}</a></td>
-        <td>{{ product.description }}</td>
-        <td>{{ product.price | currency }}</td>
-        <td><a ng-if="user.userId" ng-click="addToCart(product, 1)">Add to Cart</a></td>
-    </tr>
-</table>
-<div ng-if="user.role === 'admin'">
-    <h3>Create Product</h3>
-</div>-->
-
 <div class = "container">
     <div class = "row">
         <div class = "col-md-4" ng-repeat = "product in products">
             <p><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a>
-            <!--<p>{{product.description}}</p>-->
             <p>{{product.price | currency }}</p>
             <p>{{product.categories[0]}}</p> 
             <button class="btn btn-primary" ng-click="popup(product.stub)">Quick View</button>
