@@ -332,6 +332,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
                 service.user.userId = authData.uid;
             })
             .catch(function (error) {
+                service.error = error;
                 console.log(error);
             });
     };
