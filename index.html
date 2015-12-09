@@ -34,17 +34,17 @@
                 </form>
                 <ul id="user-status" class="nav navbar-nav navbar-right">
                     <!-- Only show if they are signed in-->
-                    <li ng-show='user.userId'>Hello, {{ user.name }}</li>
+                    <li ng-show='user.userId'><a>Hello, {{ user.name }}</a></li>
                     <!-- Only show if they are NOT signed in-->
                     <li ng-show='!user.userId'><button type="submit" class="btn btn-default navbar-btn" ng-click='signIn()'>Sign In</button></li>
-                    <li ng-show='user.userId'><a ui-sref='logout'><button type='submit' class='btn btn-default navbar-btn'>Sign Out</button></a></li>
+                    <li ng-show='user.userId'><button type='submit' ui-sref='logout' class='btn btn-default navbar-btn'>Sign Out</button></li>
                     <!-- This will always show. -->
-                    <li><a ui-sref="cart"><i class="fa fa-shopping-cart fa-lg"></a></i>
+                    <li><a ui-sref="cart"><i class="fa fa-shopping-cart fa-lg"></i></a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <div class="container-fluid" ui-view></div>
+    <div ui-view></div>
 
     <footer>
         <p>This is a product that was created by Sanchya, Ali, Dakota, and Brandyn for the INFO 343 Final Project.</p>

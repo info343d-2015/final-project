@@ -9,6 +9,10 @@ body {
   background-color: #ddd;
 }
 
+#navbar ul#user-status a {
+    color: white;
+}
+
 .navbar-default, footer {
   background-color: #444;
 }
