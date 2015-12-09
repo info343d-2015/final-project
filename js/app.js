@@ -353,12 +353,14 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
             service.user.userId = authData.uid;
             users.$loaded(function() {
                 service.user.name = users[authData.uid].name;
+                service.user.recPref = users[authData.uid].recPref;
                 service.user.avatar = users[authData.uid].avatar;
                 service.user.role = users[authData.uid].role;
             });
         } else {
             service.user.userId = undefined;
             service.user.name = undefined;
+            service.user.recPref = undefined;
             service.user.avatar = undefined;
             service.user.role = undefined;
         }
