@@ -510,7 +510,15 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     };
 
     function saveCart() {
-        carts[UserService.user.userId] = service.cart;
+        var finalCart = {};
+        finalCart.items = [];
+        service.cart.items.forEach(function(item) {
+            var obj = {};
+            obj.id = item.id;
+            obj.quantity = item.quantity;
+            finalCart.items.push(obj);
+        });
+        carts[UserService.user.userId] = finalCart;
         carts.$save();
     }
 
