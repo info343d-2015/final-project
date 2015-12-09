@@ -376,9 +376,11 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
     };
 
     service.requireLogin = function() {
-        if(!service.isLoggedIn()) {
-            $location.path("/user/login");
-        }
+        users.$loaded(function() {
+            if(!service.isLoggedIn()) {
+                $location.path("/user/login");
+            }
+        });
     };
 
     return service;
