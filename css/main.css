@@ -170,9 +170,6 @@ img.product-img {
     font-size: 16px;
   }
 
-  .details-main .cart-add {
-    
-  }
 
   .primary-img {
     width: 100%;
@@ -196,5 +193,13 @@ img.product-img {
     font-weight: 400;
   }
 
+  /*
+   * Cart Styles
+   */
+
+  .cart-main {
+    padding: 30px 10%;
+    font-size: 16px;
+  }
 
 /*# sourceMappingURL=main.css.map */

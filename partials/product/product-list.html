@@ -1,6 +1,6 @@
 <div class = "container">
     <div class = "row">
-        <div class = "col-md-4" ng-repeat = "product in products">
+        <div class = "col-md-4" ng-repeat = "product in products | filter:searchQuery">
             <p><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a>
             <p>{{product.price | currency }}</p>
             <p>{{product.categories[0]}}</p> 
@@ -8,3 +8,4 @@
         </div>
     </div>
 </div>
+<p>{{searchQuery}}</p>

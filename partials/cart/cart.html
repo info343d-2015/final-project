@@ -1,21 +1,18 @@
-<!--<div ng-repeat="item in process(cart.items)">
-    <p>{{item.product.name}}</p>
-    <p>Quantity: {{item.quantity}}</p>
-    <p><a ng-click="removeProduct(item)">Remove</a></p>
-</div>-->
-<h2> My Shopping Cart </h2>
-<div>
-
-	<table class = "table">
+<div class="cart-main container-fuild">
+	<h2> My Shopping Cart </h2>
+	<table class="table">
 		<tr>
-			<th>name</th>
-			<th>price</th>
-			<th>quantity</th>
+			<th>Name</th>
+			<th>Quantity</th>
+			<th>Price</th>
+			<th>Remove</th>
 		</tr>
-		<tr ng-repeat = "item in process(cart)">
+		<tr ng-repeat="item in process(cart.items)">
 			<td>{{item.product.name}}</td>
-			<td>{{item.product.price|currency}} </td>
-			<td>{{item.product.quantity}}</td>
+		    <td><i ng-click="increaseQty(item, item.quantity)" class="fa fa-plus-circle"></i> {{item.quantity}} <i ng-click="decreaseQty(item, item.quantity)" class="fa fa-minus-circle"></i></td>
+		    <td>{{item.product.price|currency}} </td>
+		    <td><a ng-click="removeProduct(item)"><i class="fa fa-times"></i></a></td>
 		</tr>
-
+	</table>
+	<button class="btn btn-default navbar-btn">Check out</button>
 </div>

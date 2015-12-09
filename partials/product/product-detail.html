@@ -50,7 +50,8 @@
         <h3>Reviews</h3>
         <div ng-show="product.reviews" ng-repeat="review in product.reviews.slice().reverse()">
             <h4>{{review.title}}</h4>
-            <div ng-raty="ratyOptions" ng-model="review.rating"></div>
+          
+          
             <p>{{review.body}} - By {{getUser(review.author).name}}</p>
             <p ng-if="review.author === user.userId || user.role === 'admin'"><a ng-click="removeReview(product, review)">Remove</a></p>
         </div>
