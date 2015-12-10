@@ -53,20 +53,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 app.controller('HeaderCtrl', function($scope, $location, UserService, SearchService, $uibModal) {
     $scope.user = UserService.user;
 
-    $scope.signIn = function() {
-        var modalInstance = $uibModal.open({
-            templateUrl: 'partials/user/login.html',
-            controller: 'LoginCtrl'
-        });
-    };
+    $scope.signIn = UserService.loginModal;
 
     $scope.search = function() {
         console.log("in the search function:" + $scope.searchQuery);
         SearchService.updateQuery($scope.searchQuery);
         $location.path("/products");
     }
-
-
 });
 
 //controller for the modal to make quick view pop up
@@ -228,8 +221,8 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
     };
 });
 
-app.controller('LoginCtrl', function($scope, $uibModalInstance, UserService, $uibModal) {
-
+app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserService, $uibModal) {
+    $scope.btnCancel = options.btnCancel || false;
     $scope.signin = function(login) {
         UserService.signin(login.email, login.password);
         $uibModalInstance.close();
@@ -241,16 +234,13 @@ app.controller('LoginCtrl', function($scope, $uibModalInstance, UserService, $ui
 
     $scope.goToSignUp = function() {
         $uibModalInstance.close();
-        var modalInstance = $uibModal.open({
-            templateUrl: 'partials/user/signup.html',
-            controller: 'SignUpCtrl'
-        });
+        UserService.signupModal($scope.btnCancel);
     };
 
 });
 
-app.controller('SignUpCtrl', function($scope, $uibModalInstance, UserService) {
-            console.log('got here');
+app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserService) {
+    $scope.btnCancel = options.btnCancel || false;
 
     $scope.createAccount = function (signup) {
         UserService.signup(signup);
@@ -290,7 +280,7 @@ app.factory('SystemService', function() {
     return service;
 });
 
-app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, SystemService) {
+app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $uibModal, SystemService) {
     var service = {};
     var Auth = $firebaseAuth(SystemService.ref);
     var usersRef = SystemService.ref.child('users');
@@ -378,7 +368,37 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
     service.requireLogin = function() {
         users.$loaded(function() {
             if(!service.isLoggedIn()) {
-                $location.path("/user/login");
+                service.loginModal(true);
+            }
+        });
+    };
+
+    service.loginModal = function(disableCancel) {
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/user/login.html',
+            controller: 'LoginCtrl',
+            backdrop: 'static',
+            resolve: {
+                options: function() {
+                    var service = {};
+                    service.btnCancel = disableCancel;
+                    return service;
+                }
+            }
+        });
+    };
+
+    service.signupModal = function(disableCancel) {
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/user/signup.html',
+            controller: 'SignUpCtrl',
+            backdrop: 'static',
+            resolve: {
+                options: function() {
+                    var service = {};
+                    service.btnCancel = disableCancel;
+                    return service;
+                }
             }
         });
     };
