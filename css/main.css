@@ -34,14 +34,15 @@ body {
   color: #444;
 }
 
-.navbar-btn, .navbar-btn:focus, .navbar-button, .quick-btn {
+.navbar-btn, .navbar-btn:focus, .navbar-button, .quick-btn, .checkout-btn {
   background-color: #fc8e18;
   border-color: #444;
 }
 
 .navbar-default .navbar-btn:hover, .navbar-default
 .navbar-button:hover, .quick-btn:hover,
-.quick-btn:focus, .quick-btn:active, .quick-btn.active {
+.quick-btn:focus, .quick-btn:active, .quick-btn.active,
+.checkout-btn:hover, .checkout-btn:focus, .checkout-btn:active, .checkout-btn.active {
   background-color: #CF6F08;
   border-color: #444;
 }
