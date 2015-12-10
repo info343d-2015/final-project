@@ -216,7 +216,6 @@ app.controller('LogoutCtrl', function($scope, $location, UserService) {
 app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, ProductService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
-    $scope.createProduct = UserService.CreateProduct;
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
