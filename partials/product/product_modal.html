@@ -1,12 +1,12 @@
 <div class="product-modal">
-	<img class="modal-product-image" src="{{product.image || 'img/placeholder.jpg'}}">
+	<img class="modal-product-image" ng-src="{{product.image || 'img/placeholder.jpg'}}">
 	<h3 class="product-title"><a ui-sref="product-detail({id: product.stub})" ng-click="closemod()">{{product.name}}</a></h3>
 	<div ng-raty="ratyOptions" ng-model="avgRating" ng-if="avgRating!=-1"></div>
 	<h4 class="product-price">{{product.price | currency }}</h4>
 	<p class="product-description">{{product.description}}</p>
 
 	<div class="modal-btn-wrapper">
-		<button class="btn btn-primary quick-btn" ng-click="addcartmod(product)">Add To Cart</button>
-		<button class="btn btn-primary quick-btn" ng-click="closemod()">Close Quick View</button>
+		<button class="btn quick-btn" ng-click="addcartmod(product)">Add To Cart</button>
+		<button class="btn quick-btn" ng-click="closemod()">Close Quick View</button>
 	</div>
 </div>

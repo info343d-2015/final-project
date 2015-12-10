@@ -16,6 +16,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/user/logout',
             controller: 'LogoutCtrl'
         })
+        .state('orders', {
+            url: '/user/orders',
+            templateUrl: 'partials/user/orders.html',
+            controller: 'OrderCtrl'
+        })
         .state('product-list', {
             url: '/products',
             templateUrl: 'partials/product/product-list.html',
@@ -34,17 +39,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
         .state('payment', {
             url: '/cart/payment',
             templateUrl: 'partials/checkout/payment.html',
-            controller: 'PaymentCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('address', {
             url: '/cart/shipping-address',
             templateUrl: 'partials/checkout/address.html',
-            controller: 'AddressCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('complete', {
             url: '/cart/checkout-complete',
             templateUrl: 'partials/checkout/checkout-complete.html',
-            controller: 'CompleteCtrl'
+            controller: 'CheckoutCtrl'
         });
 
     $urlRouterProvider.otherwise('/');
@@ -108,8 +113,8 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
-    $scope.createProduct = UserService.CreateProduct;
     $scope.categories = [];
+    $scope.createProduct = ProductService.CreateProduct;
     //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
@@ -305,18 +310,24 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
     }
 });
 
-app.controller('AddressCtrl', function($scope, UserService) {
-
+app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
+    console.log(OrderService.previous.orders);
+    $scope.previous = OrderService.previous;
 });
 
-app.controller('PaymentCtrl', function($scope, UserService) {
+app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
+    $scope.order = OrderService.order;
 
+    $scope.addOrder = function() {
+        $scope.order.cart = CartService.cart;
+        $scope.order.owner = UserService.user.userId;
+        $scope.order.orderDate = (new Date()).toString();
+        console.log($scope.order);
+        OrderService.addOrder($scope.order);
+        $scope.order = {};
+        CartService.clearCart();
+    };
 });
-
-app.controller('CompleteCtrl', function($scope, UserService) {
-
-});
-
 
 app.factory('SystemService', function() {
     var service = {};
@@ -580,6 +591,13 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     service.reloadCart();
     SystemService.addCall(service.reloadCart);
 
+    service.clearCart = function() {
+        carts.$loaded(function() {
+            service.cart.items = [];
+            saveCart();
+        });
+    };
+
     service.addToCart = function(product) {
         UserService.requireLogin(function() {
             carts.$loaded(function() {
@@ -590,6 +608,9 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
                     service.cart.items.push(item);
                 } else {
                     service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
+                    if (service.cart.items[indexOf(item, service.cart.items)].quantity > 1000) {
+                        service.cart.items[indexOf(item, service.cart.items)].quantity = 1000;
+                    }
                 }
                 saveCart();
             });
@@ -600,6 +621,11 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
 
     service.updateQuantity = function(product, quantity) {
         product.quantity = quantity;
+        if (product.quantity > 1000) {
+            product.quantity = 1000;
+        } else if (product.quantity < 1) {
+            product.quantity = 1;
+        }
         saveCart();
     };
 
@@ -643,4 +669,34 @@ app.factory('SearchService', function(SystemService) {
     
     return service;
 
+});
+
+app.factory('OrderService', function($firebaseArray, $filter, SystemService, UserService) {
+    var service = {};
+    var ordersRef = SystemService.ref.child('orders');
+    var orders = $firebaseArray(ordersRef);
+
+    service.order = {};
+    service.previous = {};
+
+    service.addOrder = function(order) {
+        orders.$add(order);
+    };
+
+    var refreshOrders = function() {
+        if(UserService.isLoggedIn()) {
+            orders.$loaded(function() {
+                service.previous.orders = $filter('filter')(orders, {
+                        owner: UserService.user.userId
+                    }, true) || [];
+            });
+        } else {
+            service.previous.orders = [];
+        }
+    };
+
+    SystemService.addCall(refreshOrders);
+    refreshOrders();
+
+    return service;
 });
