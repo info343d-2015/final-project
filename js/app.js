@@ -217,6 +217,7 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.createProduct = UserService.CreateProduct;
+    $scope.createProduct('Rain Jacket', 'A reliable rain jacket for all those riany days.', 90, 'http://i.stpost.com/trespass-qikpac-jacket-waterproof-for-men-and-women-in-cobalt~p~5240x_02~1500.2.jpg');
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
@@ -448,14 +449,14 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
 
     updateCategories();
 
-    service.CreateProduct = function(name, description, price) {
+    service.CreateProduct = function(name, description, price, img) {
         var obj = {};
         obj.name = name;
         obj.description = description;
         obj.price = price;
         obj.reviews = [];
         obj.stock = 0;
-        obj.image = "img/placeholder.jpg";
+        obj.image = img;
         obj.stub = name.toLowerCase().replace(/ /g,"-");
         service.products.$add(obj);
     };
