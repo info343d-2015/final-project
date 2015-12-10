@@ -16,6 +16,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/user/logout',
             controller: 'LogoutCtrl'
         })
+        .state('orders', {
+            url: '/user/orders',
+            templateUrl: 'partials/user/orders.html',
+            controller: 'OrderCtrl'
+        })
         .state('product-list', {
             url: '/products',
             templateUrl: 'partials/product/product-list.html',
@@ -272,6 +277,10 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
         $uibModalInstance.close();
         if(options.errorCall) options.errorCall();
     }
+});
+
+app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
+    $scope.previous = OrderService.previous;
 });
 
 app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
@@ -620,14 +629,31 @@ app.factory('SearchService', function(SystemService) {
 
 });
 
-app.factory('OrderService', function(SystemService) {
+app.factory('OrderService', function($firebaseArray, $filter, SystemService, UserService) {
     var service = {};
     var ordersRef = SystemService.ref.child('orders');
-    service.orders = $firebaseArray(ordersRef);
+    var orders = $firebaseArray(ordersRef);
+
+    service.previous = {};
 
     service.addOrder = function(order) {
-        service.orders.$add(order);
+        orders.$add(order);
     };
+
+    var refreshOrders = function() {
+        if(UserService.isLoggedIn()) {
+            orders.$loaded(function() {
+                service.previous.orders = $filter('filter')(orders, {
+                        owner: UserService.user.userId
+                    }, true)[0] || [];
+            });
+        } else {
+            service.previous.orders = [];
+        }
+    };
+
+    SystemService.addCall(refreshOrders);
+    refreshOrders();
 
     return service;
 });
