@@ -249,7 +249,7 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
     $scope.btnCancel = options.btnCancel || false;
 
     $scope.createAccount = function (signup) {
-        UserService.signup(signup).then(function() {
+        UserService.signup(signup, function() {
             if(options.successCall) options.successCall();
         });
         $uibModalInstance.close();
@@ -302,7 +302,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         return users[id];
     };
 
-    service.signup = function (user) {
+    service.signup = function (user, callback) {
         console.log("creating user " + user.email);
 
         Auth.$createUser({
@@ -318,7 +318,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 }
 
                 if (!service.user.recPref) {
-                    service.user.recPref = user.recPref;
+                    service.user.recPref = user.recPref || 'None';
                 }
 
                 users[authData.uid] = {
@@ -330,7 +330,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 users.$save();
 
                 service.user.userId = authData.uid;
-            })
+            }).then(service.reloadCart).then(callback)
             .catch(function (error) {
                 console.log(error);
             });
@@ -514,7 +514,7 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
             });
 
         } else {
-            service.cart.items = undefined; 
+            service.cart.items = [];
         }
     };
 
