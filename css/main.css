@@ -160,6 +160,13 @@ img.promo {
   padding: 30px 30px 70px 30px;
 }
 
+@media (max-width: 786px) {
+  .modal-product-image {
+    max-height: 300px;
+    max-width: 300px;
+  }
+}
+
 @media (min-width: 768px) {
   .sidebar {
     position: fixed;
