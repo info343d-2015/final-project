@@ -306,6 +306,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     var service = {};
     var Auth = $firebaseAuth(SystemService.ref);
     var usersRef = SystemService.ref.child('users');
+    var requiredLogin = false;
 
     var users = $firebaseObject(usersRef);
     service.$loaded = users.$loaded;
@@ -391,7 +392,18 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     service.requireLogin = function(successCall, errorCall) {
         users.$loaded(function() {
             if(!service.isLoggedIn()) {
-                service.loginModal(false, successCall, errorCall);
+                if(!requiredLogin) {
+                    requiredLogin = true;
+                    var success = function() {
+                        successCall();
+                        requiredLogin = false;
+                    };
+                    var error = function() {
+                        errorCall();
+                        requiredLogin = false;
+                    }
+                    service.loginModal(false, success, error);
+                }
             } else {
                 if(successCall) successCall();
             }
