@@ -188,6 +188,7 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
         alert('You must login to access your cart');
         $location.path('home');
     });
+
     $scope.cart = CartService.cart;
     console.log($scope.cart);
     $scope.removeProduct = CartService.removeFromCart;
@@ -210,6 +211,15 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
         }
         return cart;
     };
+    $scope.Total = function(){
+            var county = 0;
+            console.log($scope.cart);
+            for(var i=0; i<$scope.cart.items.length; i++){
+                var amount = $scope.cart.items[i];
+                county+=amount.product.price*amount.quantity;
+            }
+            return county;
+        }
 });
 
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
