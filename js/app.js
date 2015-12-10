@@ -98,6 +98,7 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
     $scope.closemod = function(){
         $uibModalInstance.close();
     }
+
     $scope.ratyOptions = {
         half: false,
         cancel: false,
@@ -105,13 +106,15 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
         starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
         starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
     };
+
 });
 
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService, SearchService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
-    $scope.createProduct = UserService.CreateProduct;
+    $scope.categories = [];
+    $scope.createProduct = ProductService.CreateProduct;
     //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
@@ -121,7 +124,34 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     };
 
     $scope.searchQuery = SearchService.query;
+    $scope.searchFilter = "";
+    $scope.sortingCriteria = "name";
+    console.log($scope.searchFilter);
     //console.log($scope.searchQuery);
+
+    $scope.updateList = function(category) {
+        console.log(category);
+        $scope.searchFilter = category;
+    };
+
+    $scope.products.$loaded(function() {
+        for(var i = 0; i < $scope.products.length; i++) {
+            if($scope.products[i].categories) {
+                for(var j = 0; j < $scope.products[i].categories.length; j++) {
+                    var current = $scope.products[i].categories[j];
+                    if($scope.categories.indexOf(current) == -1) {
+                        $scope.categories.push(current);
+                    }
+                }
+            }
+        }
+    })
+
+    // $scope.score5 = 5;
+    // $scope.score4 = 4;
+    // $scope.score3 = 3;
+    // $scope.score2 = 2;
+    // $scope.score1 = 1;
 
     $scope.ratyOptions = {
         half: false,
@@ -147,6 +177,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                 stub: $stateParams.id
             }, true)[0];
             console.log($scope.product);
+
             var sum = 0;
             if($scope.product.reviews) {
                 for(var i = 0; i < $scope.product.reviews.length; i++) {
@@ -305,6 +336,12 @@ app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderS
         OrderService.addOrder($scope.order);
         $scope.order = {};
         CartService.clearCart();
+    };
+});
+
+app.controller('InCartCtrl', function($scope, $uibModalInstance) {
+    $scope.closeModal = function() {
+        $uibModalInstance.close();
     };
 });
 
@@ -545,7 +582,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
     return service;
 });
 
-app.factory('CartService', function($firebaseObject, SystemService, UserService) {
+app.factory('CartService', function($firebaseObject, $uibModal, SystemService, UserService) {
     var service = {};
     var cartsRef = SystemService.ref.child('carts');
     var carts = $firebaseObject(cartsRef);
@@ -591,6 +628,10 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
                         service.cart.items[indexOf(item, service.cart.items)].quantity = 1000;
                     }
                 }
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'partials/cart/incart-modal.html',
+                    controller: 'InCartCtrl'
+                });
                 saveCart();
             });
         }, function() {
