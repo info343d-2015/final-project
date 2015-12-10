@@ -213,7 +213,7 @@ app.controller('LogoutCtrl', function($scope, $location, UserService) {
     $location.path('home'); //TODO: Redirect to pre-existing page
 });
 
-app.controller('HomeCtrl', function($scope, $location, UserService, ProductService, CartService) {
+app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, ProductService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.createProduct = UserService.CreateProduct;
@@ -223,7 +223,18 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
         $scope.quantity = undefined;
         $location.path("cart");
     };
-    
+
+    $scope.popup = function(stub){
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/product/product_modal.html',
+            controller: 'ProductModal',
+            resolve: {
+                ProdId : function() {
+                    return stub;
+                }
+            }
+        });
+    };
 });
 
 
