@@ -36,7 +36,9 @@ body {
   border-color: #444;
 }
 
-.navbar-default .navbar-btn:hover, .navbar-default .navbar-button:hover, .quick-btn:hover {
+.navbar-default .navbar-btn:hover, .navbar-default
+.navbar-button:hover, .quick-btn:hover,
+.quick-btn:focus, .quick-btn:active, .quick-btn.active {
   background-color: #CF6F08;
   border-color: #444;
 }

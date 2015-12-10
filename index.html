@@ -28,7 +28,7 @@
                   <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search" ng-model="searchQuery">
                     <span class="input-group-btn">
-                        <button type="submit" ng-click="search()" class="btn btn-default navbar-button"><i class="fa fa-search"></i></button>
+                        <button type="submit" ng-click="search()" class="btn navbar-button"><i class="fa fa-search"></i></button>
                     </span>
                   </div>
                 </form>
@@ -36,8 +36,8 @@
                     <!-- Only show if they are signed in-->
                     <li ng-show='user.userId'><a>Hello, {{ user.name }}</a></li>
                     <!-- Only show if they are NOT signed in-->
-                    <li ng-show='!user.userId'><button type="submit" class="btn btn-default navbar-btn" ng-click='signIn()'>Sign In</button></li>
-                    <li ng-show='user.userId'><button type='submit' ui-sref='logout' class='btn btn-default navbar-btn'>Sign Out</button></li>
+                    <li ng-show='!user.userId'><button type="submit" class="btn navbar-btn" ng-click='signIn()'>Sign In</button></li>
+                    <li ng-show='user.userId'><button type='submit' ui-sref='logout' class='btn navbar-btn'>Sign Out</button></li>
                     <!-- This will always show. -->
                     <li><a ui-sref="cart"><i class="fa fa-shopping-cart fa-lg"></i></a></li>
                 </ul>
