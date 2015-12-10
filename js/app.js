@@ -380,6 +380,8 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         users.$loaded(function() {
             if(!service.isLoggedIn()) {
                 service.loginModal(false, successCall, errorCall);
+            } else {
+                if(successCall) successCall();
             }
         });
     };
