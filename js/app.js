@@ -34,17 +34,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
         .state('payment', {
             url: '/cart/payment',
             templateUrl: 'partials/checkout/payment.html',
-            controller: 'PaymentCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('address', {
             url: '/cart/shipping-address',
             templateUrl: 'partials/checkout/address.html',
-            controller: 'AddressCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('complete', {
             url: '/cart/checkout-complete',
             templateUrl: 'partials/checkout/checkout-complete.html',
-            controller: 'CompleteCtrl'
+            controller: 'CheckoutCtrl'
         });
 
     $urlRouterProvider.otherwise('/');
@@ -274,18 +274,17 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
     }
 });
 
-app.controller('AddressCtrl', function($scope, UserService) {
+app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
+    $scope.order = {};
 
+    $scope.addOrder = function() {
+        $scope.order.cart = CartService.cart;
+        $scope.order.owner = UserService.user.userId;
+        OrderService.addOrder($scope.order);
+        $scope.order = {};
+        CartService.clearCart();
+    };
 });
-
-app.controller('PaymentCtrl', function($scope, UserService) {
-
-});
-
-app.controller('CompleteCtrl', function($scope, UserService) {
-
-});
-
 
 app.factory('SystemService', function() {
     var service = {};
@@ -549,6 +548,13 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     service.reloadCart();
     SystemService.addCall(service.reloadCart);
 
+    service.clearCart = function() {
+        carts.$loaded(function() {
+            service.cart.items = [];
+            saveCart();
+        });
+    };
+
     service.addToCart = function(product) {
         UserService.requireLogin(function() {
             carts.$loaded(function() {
@@ -612,4 +618,16 @@ app.factory('SearchService', function(SystemService) {
     
     return service;
 
+});
+
+app.factory('OrderService', function(SystemService) {
+    var service = {};
+    var ordersRef = SystemService.ref.child('orders');
+    service.orders = $firebaseArray(ordersRef);
+
+    service.addOrder = function(order) {
+        service.orders.$add(order);
+    };
+
+    return service;
 });
