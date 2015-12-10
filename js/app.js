@@ -280,15 +280,18 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
 });
 
 app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
+    console.log(OrderService.previous.orders);
     $scope.previous = OrderService.previous;
 });
 
 app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
-    $scope.order = {};
+    $scope.order = OrderService.order;
 
     $scope.addOrder = function() {
         $scope.order.cart = CartService.cart;
         $scope.order.owner = UserService.user.userId;
+        $scope.order.orderDate = (new Date()).toString();
+        console.log($scope.order);
         OrderService.addOrder($scope.order);
         $scope.order = {};
         CartService.clearCart();
@@ -634,6 +637,7 @@ app.factory('OrderService', function($firebaseArray, $filter, SystemService, Use
     var ordersRef = SystemService.ref.child('orders');
     var orders = $firebaseArray(ordersRef);
 
+    service.order = {};
     service.previous = {};
 
     service.addOrder = function(order) {
@@ -645,7 +649,7 @@ app.factory('OrderService', function($firebaseArray, $filter, SystemService, Use
             orders.$loaded(function() {
                 service.previous.orders = $filter('filter')(orders, {
                         owner: UserService.user.userId
-                    }, true)[0] || [];
+                    }, true) || [];
             });
         } else {
             service.previous.orders = [];
