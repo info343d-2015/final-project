@@ -3,32 +3,32 @@
 	<form name='shippingAddress' novalidate>
 		<div class='form-group' ng-class="{'has-error': shippingAddress.fullName.$touched && shippingAddress.fullName.$invalid}">
 			<label name='fullNameInput'>Full Name:</label>
-			<input type='text' id='fullNameInput' name='fullName' ng-model='fullName' class='form-control' ng-minlength='3' required />
+			<input type='text' id='fullNameInput' name='fullName' ng-model='order.fullName' class='form-control' ng-minlength='3' required />
 		</div>
 		<div class='form-group' ng-class="{'has-error': shippingAddress.address1.$touched && shippingAddress.address1.$invalid}">
 			<label name='address1Input'>Address Line 1:</label>
-			<input name='address1' type='text' id='address1Input' class='form-control' ng-model='address1' required />
+			<input name='address1' type='text' id='address1Input' class='form-control' ng-model='order.address1' required />
 		</div>
 		<div class='form-group'>
 			<label name='address2Input'>Address Line 2:</label>
-			<input type='text' id='address2Input' class='form-control' />
+			<input type='text' id='address2Input' ng-model='order.address2' class='form-control' />
 		</div>
 		<div class='form-group' ng-class="{'has-error': shippingAddress.city.$touched && shippingAddress.city.$invalid}">
 			<label name='cityInput'>City:</label>
-			<input type='text' name='city' ng-model='city' id='cityInput' class='form-control' required />
+			<input type='text' name='city' ng-model='order.city' id='cityInput' class='form-control' required />
 		</div>
 		<div class='form-group' ng-class="{'has-error': shippingAddress.state.$touched && shippingAddress.state.$invalid}">
 			<label name='stateInput'>State:</label>
-			<input type='text' name='state' ng-model='state' id='stateInput' class='form-control' required />
+			<input type='text' name='state' ng-model='order.state' id='stateInput' class='form-control' required />
 		</div>
 		<div class='form-group' ng-class="{'has-error': shippingAddress.zip.$touched && shippingAddress.zip.$invalid}">
 			<label name='zipInput'>Zip:</label>
-			<input type='text' name='zip' ng-model='zip' id='zipInput' class='form-control' required />
+			<input type='text' name='zip' ng-model='order.zip' id='zipInput' class='form-control' required />
 		</div>
 		<div class='form-group'>
 			<label name='phoneInput'>Phone Number:</label>
-			<input type='text' id='phoneInput' class='form-control' />
+			<input type='text' id='phoneInput' ng-model='order.phone' class='form-control' />
 		</div>
-		<button class='btn btn-default' ng-disabled='shippingAddress.$invalid' ui-sref='payment'>Complete Address</button>
+		<button class='btn checkout-btn' ng-disabled='shippingAddress.$invalid' ui-sref='payment'>Complete Address</button>
 	</form>
 </div>
