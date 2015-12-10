@@ -53,6 +53,12 @@ body {
     left: 10px;
 }
 
+.jumbotron {
+  background-image: url('../img/fire.gif');
+  color: #ddd;
+  padding-bottom: 35px;
+}
+
 .modal-product-image {
     max-width: 100%;
 }
