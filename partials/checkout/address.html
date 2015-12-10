@@ -1,6 +1,6 @@
 <div class='container col-md-8 col-lg-9'>
 	<h1>Enter a Shipping Address</h1>
-	<form class='form-horizontal' name='shippingAddress' novalidate>
+	<form name='shippingAddress' novalidate>
 		<div class='form-group' ng-class="{'has-error': shippingAddress.fullName.$touched && shippingAddress.fullName.$invalid}">
 			<label name='fullNameInput'>Full Name:</label>
 			<input type='text' id='fullNameInput' name='fullName' ng-model='fullName' class='form-control' ng-minlength='3' required />
@@ -29,6 +29,6 @@
 			<label name='phoneInput'>Phone Number:</label>
 			<input type='text' id='phoneInput' class='form-control' />
 		</div>
-		<button class='btn btn-default' ng-disable='shippingAddress.$invalid' ui-sref='payment'>Complete Address</button>
+		<button class='btn btn-default' ng-disabled='shippingAddress.$invalid' ui-sref='payment'>Complete Address</button>
 	</form>
 </div>
