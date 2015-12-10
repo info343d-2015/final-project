@@ -13,7 +13,7 @@
             </ul>
             <p>{{product.description}}</p>
 
-            <form class="cart-add" ng-if="user.userId" novalidate>
+            <form class="cart-add" novalidate>
                 <input type="number" min="0" max="1000" ng-model="quantity" placeholder="Quantity"/>
                 <input type="submit" ng-click="addToCart(product, quantity)" value="Add to Cart" />
             </form>

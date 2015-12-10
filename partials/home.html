@@ -34,7 +34,7 @@
   <div class='row'>
   	<div class='product recommended-product col-xs-12 col-sm-4 col-md-3 col-lg-3' ng-repeat='product in products'> <!-- We want to finter on the product catagory that user set.-->
   		<img class='product-img' src="{{product.image || 'img/placeholder.jpg'}}">
-  		<h3 class='product-title'>{{product.name}}</h3>
+  		<h3 class='product-title'><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a></h3>
       <h4 class='product-price'>{{product.price | currency }}</h4>
       <button class="btn quick-btn" ng-click="popup(product.stub)">Quick View</button>
   	</div>

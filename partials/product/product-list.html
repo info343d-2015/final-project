@@ -8,4 +8,15 @@
             <button class="btn btn-primary quick-btn" ng-click="popup(product.stub)">Quick View</button>
         </div>
     </div>
+    <div ng-if="user.role === 'admin'">
+        <h3>Create Product</h3>
+        <form>
+            <input type="text" ng-model="product.name" placeholder="Name" />
+            <textarea ng-model="product.description" placeholder="Description"></textarea>
+            <input type="number" ng-model="product.price" placeholder="Price"/>
+            <input type="text" ng-model="product.manufacturer" placeholder="Manufacturer" />
+            <input type="text" ng-model="product.image" placeholder="Image URL" />
+            <input type="submit" ng-click="createProduct(product.name, product.description, product.price, product.manufacturer, product.image)" value="Create Product"/>
+        </form>
+    </div>
 </div>
