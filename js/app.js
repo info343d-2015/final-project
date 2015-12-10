@@ -459,14 +459,15 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
 
     updateCategories();
 
-    service.CreateProduct = function(name, description, price) {
+    service.CreateProduct = function(name, description, price, manufacturer, image) {
         var obj = {};
         obj.name = name;
         obj.description = description;
         obj.price = price;
         obj.reviews = [];
         obj.stock = 0;
-        obj.image = "img/placeholder.jpg";
+        obj.image = image || "img/placeholder.jpg";
+        obj.manufacturer = manufacturer;
         obj.stub = name.toLowerCase().replace(/ /g,"-");
         service.products.$add(obj);
     };
