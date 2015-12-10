@@ -216,11 +216,6 @@ app.controller('LogoutCtrl', function($scope, $location, UserService) {
 app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, ProductService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
-<<<<<<< HEAD
-    $scope.createProduct = UserService.CreateProduct;
-    $scope.createProduct('Rain Jacket', 'A reliable rain jacket for all those riany days.', 90, 'http://i.stpost.com/trespass-qikpac-jacket-waterproof-for-men-and-women-in-cobalt~p~5240x_02~1500.2.jpg');
-=======
->>>>>>> 9e2c336d347b6ce965ce874e8fec0bf5505e8ceb
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
@@ -475,23 +470,15 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
 
     updateCategories();
 
-<<<<<<< HEAD
-    service.CreateProduct = function(name, description, price, img) {
-=======
     service.CreateProduct = function(name, description, price, manufacturer, image) {
->>>>>>> 9e2c336d347b6ce965ce874e8fec0bf5505e8ceb
         var obj = {};
         obj.name = name;
         obj.description = description;
         obj.price = price;
         obj.reviews = [];
         obj.stock = 0;
-<<<<<<< HEAD
-        obj.image = img;
-=======
         obj.image = image || "img/placeholder.jpg";
         obj.manufacturer = manufacturer;
->>>>>>> 9e2c336d347b6ce965ce874e8fec0bf5505e8ceb
         obj.stub = name.toLowerCase().replace(/ /g,"-");
         service.products.$add(obj);
     };
