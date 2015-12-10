@@ -223,7 +223,9 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
         $scope.quantity = undefined;
         $location.path("cart");
     };
+    
 });
+
 
 app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserService, $uibModal) {
     $scope.btnCancel = options.btnCancel || false;
