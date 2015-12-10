@@ -16,6 +16,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/user/logout',
             controller: 'LogoutCtrl'
         })
+        .state('orders', {
+            url: '/user/orders',
+            templateUrl: 'partials/user/orders.html',
+            controller: 'OrderCtrl'
+        })
         .state('product-list', {
             url: '/products',
             templateUrl: 'partials/product/product-list.html',
@@ -34,17 +39,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
         .state('payment', {
             url: '/cart/payment',
             templateUrl: 'partials/checkout/payment.html',
-            controller: 'PaymentCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('address', {
             url: '/cart/shipping-address',
             templateUrl: 'partials/checkout/address.html',
-            controller: 'AddressCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('complete', {
             url: '/cart/checkout-complete',
             templateUrl: 'partials/checkout/checkout-complete.html',
-            controller: 'CompleteCtrl'
+            controller: 'CheckoutCtrl'
         });
 
     $urlRouterProvider.otherwise('/');
@@ -274,18 +279,21 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
     }
 });
 
-app.controller('AddressCtrl', function($scope, UserService) {
-
+app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
+    $scope.previous = OrderService.previous;
 });
 
-app.controller('PaymentCtrl', function($scope, UserService) {
+app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
+    $scope.order = {};
 
+    $scope.addOrder = function() {
+        $scope.order.cart = CartService.cart;
+        $scope.order.owner = UserService.user.userId;
+        OrderService.addOrder($scope.order);
+        $scope.order = {};
+        CartService.clearCart();
+    };
 });
-
-app.controller('CompleteCtrl', function($scope, UserService) {
-
-});
-
 
 app.factory('SystemService', function() {
     var service = {};
@@ -549,6 +557,13 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     service.reloadCart();
     SystemService.addCall(service.reloadCart);
 
+    service.clearCart = function() {
+        carts.$loaded(function() {
+            service.cart.items = [];
+            saveCart();
+        });
+    };
+
     service.addToCart = function(product) {
         UserService.requireLogin(function() {
             carts.$loaded(function() {
@@ -612,4 +627,33 @@ app.factory('SearchService', function(SystemService) {
     
     return service;
 
+});
+
+app.factory('OrderService', function($firebaseArray, $filter, SystemService, UserService) {
+    var service = {};
+    var ordersRef = SystemService.ref.child('orders');
+    var orders = $firebaseArray(ordersRef);
+
+    service.previous = {};
+
+    service.addOrder = function(order) {
+        orders.$add(order);
+    };
+
+    var refreshOrders = function() {
+        if(UserService.isLoggedIn()) {
+            orders.$loaded(function() {
+                service.previous.orders = $filter('filter')(orders, {
+                        owner: UserService.user.userId
+                    }, true)[0] || [];
+            });
+        } else {
+            service.previous.orders = [];
+        }
+    };
+
+    SystemService.addCall(refreshOrders);
+    refreshOrders();
+
+    return service;
 });
