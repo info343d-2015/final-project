@@ -111,7 +111,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
-    $scope.createProduct = UserService.CreateProduct;
+    $scope.createProduct = ProductService.CreateProduct;
     //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
