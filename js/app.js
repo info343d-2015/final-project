@@ -574,6 +574,9 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
                     service.cart.items.push(item);
                 } else {
                     service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
+                    if (service.cart.items[indexOf(item, service.cart.items)].quantity > 1000) {
+                        service.cart.items[indexOf(item, service.cart.items)].quantity = 1000;
+                    }
                 }
                 saveCart();
             });
@@ -584,6 +587,11 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
 
     service.updateQuantity = function(product, quantity) {
         product.quantity = quantity;
+        if (product.quantity > 1000) {
+            product.quantity = 1000;
+        } else if (product.quantity < 1) {
+            product.quantity = 1;
+        }
         saveCart();
     };
 
