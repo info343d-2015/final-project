@@ -7,6 +7,7 @@
 
 	<div class="modal-btn-wrapper">
 		<button class="btn quick-btn" ng-click="addcartmod(product)">Add To Cart</button>
-		<button class="btn quick-btn" ng-click="closemod()">Close Quick View</button>
+		<i ng-click="closemod()" id="deletebutton" class="fa fa-times"></i>
+		<button class="btn quick-btn" ui-sref='product-detail({id: product.stub})'ng-click="closemod()">More Info</button>
 	</div>
 </div>
