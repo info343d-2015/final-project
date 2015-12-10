@@ -46,7 +46,7 @@ body {
   border-color: #444;
 }
 
-.quick-btn {
+.modal-btn-wrapper {
   position: absolute;
   bottom: 10px;
   left: 10px;
