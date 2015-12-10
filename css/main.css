@@ -17,7 +17,7 @@ body {
   background-color: #444;
 }
 
-.navbar-default .navbar-brand, .fa-shopping-cart, footer {
+.navbar-default .navbar-brand, .navbar-default .navbar-brand:focus, .fa-shopping-cart, footer {
   color: #fc8e18;
 }
 
@@ -29,7 +29,7 @@ body {
   color: #444;
 }
 
-.navbar-btn, .navbar-button, .quick-btn {
+.navbar-btn, .navbar-btn:focus, .navbar-button, .quick-btn {
   background-color: #fc8e18;
   border-color: #444;
 }
