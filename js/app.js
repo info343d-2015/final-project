@@ -298,6 +298,12 @@ app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderS
     };
 });
 
+app.controller('InCartCtrl', function($scope, $uibModalInstance) {
+    $scope.closeModal = function() {
+        $uibModalInstance.close();
+    };
+});
+
 app.factory('SystemService', function() {
     var service = {};
     service.ref = new Firebase("https://fire-store.firebaseio.com");
@@ -535,7 +541,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
     return service;
 });
 
-app.factory('CartService', function($firebaseObject, SystemService, UserService) {
+app.factory('CartService', function($firebaseObject, $uibModal, SystemService, UserService) {
     var service = {};
     var cartsRef = SystemService.ref.child('carts');
     var carts = $firebaseObject(cartsRef);
@@ -581,6 +587,10 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
                         service.cart.items[indexOf(item, service.cart.items)].quantity = 1000;
                     }
                 }
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'partials/cart/incart-modal.html',
+                    controller: 'InCartCtrl'
+                });
                 saveCart();
             });
         }, function() {
