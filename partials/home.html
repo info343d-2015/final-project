@@ -10,19 +10,11 @@
 
   <!-- Wrapper for slides -->
   <div class="carousel-inner" role="listbox">
-  	<!-- Repeat these for each of the deals in the database-->
     <div class="item active">
-      <img src="http://www.vetprofessionals.com/catprofessional/images/home-cat.jpg" alt="...">
-      <div class="carousel-caption">
-        ...
-      </div>
+      <img class='promo' src="img/sale.jpg">
     </div>
-    <!-- This will get removed-->
     <div class="item">
-      <img src="http://www.vetprofessionals.com/catprofessional/images/home-cat.jpg" alt="...">
-      <div class="carousel-caption">
-        ...
-      </div>
+      <img src="http://www.vetprofessionals.com/catprofessional/images/home-cat.jpg">
     </div>
   </div>
 
@@ -41,7 +33,7 @@
 	<h2>Recommendations</h2>
   <div class='row'>
   	<div class='product recommended-product col-xs-12 col-sm-4 col-md-3 col-lg-3' ng-repeat='product in products'> <!-- We want to finter on the product catagory that user set.-->
-  		<img class='product-img' src='http://www.vetprofessionals.com/catprofessional/images/home-cat.jpg'>
+  		<img class='product-img' src="{{product.image || 'img/placeholder.jpg'}}">
   		<h3 class='product-title'>{{product.name}}</h3>
       <h4 class='product-price'>{{product.price | currency }}</h4>
       <button class="btn quick-btn" ng-click="popup(product.stub)">Quick View</button>
