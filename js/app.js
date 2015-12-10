@@ -179,7 +179,10 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
 });
 
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
-    UserService.requireLogin($location);
+    UserService.requireLogin(null, function() {
+        alert('You must login to access your cart');
+        $location.path('home');
+    });
     $scope.cart = CartService.cart;
     $scope.removeProduct = CartService.removeFromCart;
 
@@ -224,17 +227,20 @@ app.controller('HomeCtrl', function($scope, $location, UserService, ProductServi
 app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserService, $uibModal) {
     $scope.btnCancel = options.btnCancel || false;
     $scope.signin = function(login) {
-        UserService.signin(login.email, login.password);
+        UserService.signin(login.email, login.password).then(function() {
+            if(options.successCall) options.successCall();
+        });
         $uibModalInstance.close();
     };
 
     $scope.close = function() {
         $uibModalInstance.close();
+        if(options.errorCall) options.errorCall();
     };
 
     $scope.goToSignUp = function() {
         $uibModalInstance.close();
-        UserService.signupModal($scope.btnCancel);
+        UserService.signupModal($scope.btnCancel, options.successCall, options.errorCall);
     };
 
 });
@@ -243,12 +249,15 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
     $scope.btnCancel = options.btnCancel || false;
 
     $scope.createAccount = function (signup) {
-        UserService.signup(signup);
+        UserService.signup(signup).then(function() {
+            if(options.successCall) options.successCall();
+        });
         $uibModalInstance.close();
     };
 
     $scope.close = function() {
         $uibModalInstance.close();
+        if(options.errorCall) options.errorCall();
     }
 });
 
@@ -286,6 +295,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     var usersRef = SystemService.ref.child('users');
 
     var users = $firebaseObject(usersRef);
+    service.$loaded = users.$loaded;
     service.user = {};
 
     service.getUser = function(id) {
@@ -365,15 +375,15 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         return service.user.role === 'admin';
     };
 
-    service.requireLogin = function() {
+    service.requireLogin = function(successCall, errorCall) {
         users.$loaded(function() {
             if(!service.isLoggedIn()) {
-                service.loginModal(true);
+                service.loginModal(false, successCall, errorCall);
             }
         });
     };
 
-    service.loginModal = function(disableCancel) {
+    service.loginModal = function(disableCancel, successCall, errorCall) {
         var modalInstance = $uibModal.open({
             templateUrl: 'partials/user/login.html',
             controller: 'LoginCtrl',
@@ -382,13 +392,15 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 options: function() {
                     var service = {};
                     service.btnCancel = disableCancel;
+                    service.successCall = successCall;
+                    service.errorCall = errorCall;
                     return service;
                 }
             }
         });
     };
 
-    service.signupModal = function(disableCancel) {
+    service.signupModal = function(disableCancel, successCall, errorCall) {
         var modalInstance = $uibModal.open({
             templateUrl: 'partials/user/signup.html',
             controller: 'SignUpCtrl',
@@ -397,6 +409,8 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 options: function() {
                     var service = {};
                     service.btnCancel = disableCancel;
+                    service.successCall = successCall;
+                    service.errorCall = errorCall;
                     return service;
                 }
             }
@@ -508,15 +522,21 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     SystemService.addCall(service.reloadCart);
 
     service.addToCart = function(product) {
-        var item = {};
-        item.id = product.$id;
-        item.quantity = product.quantity;
-        if(indexOf(item, service.cart.items) === -1) {
-            service.cart.items.push(item);
-        } else {
-            service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
-        }
-        saveCart();
+        UserService.requireLogin(function() {
+            carts.$loaded(function() {
+                var item = {};
+                item.id = product.$id;
+                item.quantity = product.quantity;
+                if(indexOf(item, service.cart.items) === -1) {
+                    service.cart.items.push(item);
+                } else {
+                    service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
+                }
+                saveCart();
+            });
+        }, function() {
+            alert('You must login before adding to your cart!');
+        });
     };
 
     service.updateQuantity = function(product, quantity) {
