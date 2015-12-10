@@ -56,10 +56,10 @@ app.controller('HeaderCtrl', function($scope, $location, UserService, SearchServ
     $scope.signIn = UserService.loginModal;
 
     $scope.search = function() {
-        console.log("in the search function:" + $scope.searchQuery);
+        //console.log("in the search function:" + $scope.searchQuery);
         SearchService.updateQuery($scope.searchQuery);
         $location.path("/products");
-    }
+    };
 });
 
 //controller for the modal to make quick view pop up
@@ -174,7 +174,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                    }
                }
             });
-    }
+    };
 
 });
 
@@ -583,9 +583,9 @@ app.factory('SearchService', function(SystemService) {
     var service = {};
 
     service.updateQuery = function(searchQuery) {
-        console.log("down in the service: " + searchQuery)
+        //console.log("down in the service: " + searchQuery);
         service.query = searchQuery;
-    }
+    };
     
     return service;
 

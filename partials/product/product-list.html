@@ -1,11 +1,11 @@
 <div class = "container">
     <div class = "row">
-        <div class = "col-md-4" ng-repeat = "product in products | filter:searchQuery">
-            <p><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a>
-            <p>{{product.price | currency }}</p>
-            <p>{{product.categories[0]}}</p> 
-            <button class="btn btn-primary" ng-click="popup(product.stub)">Quick View</button>
+        <div class = "product col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat = "product in products | filter:searchQuery">
+        	<img class='product-img' src="{{product.image || 'img/placeholder.jpg'}}">
+            <h3 class="product-title"><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a></h3>
+            <h4 class="product-price">{{product.price | currency }}</h4>
+            <!--<p>{{product.categories[0]}}</p> -->
+            <button class="btn btn-primary quick-btn" ng-click="popup(product.stub)">Quick View</button>
         </div>
     </div>
 </div>
-<p>{{searchQuery}}</p>
