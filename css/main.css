@@ -46,10 +46,14 @@ body {
   border-color: #444;
 }
 
-.quick-btn {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
+.fix-bottom-left, .modal-btn-wrapper {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+
+.modal-product-image {
+    max-width: 100%;
 }
 
 footer {

@@ -36,7 +36,7 @@
   		<img class='product-img' src="{{product.image || 'img/placeholder.jpg'}}">
   		<h3 class='product-title'><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a></h3>
       <h4 class='product-price'>{{product.price | currency }}</h4>
-      <button class="btn quick-btn" ng-click="popup(product.stub)">Quick View</button>
+      <button class="btn quick-btn fix-bottom-left" ng-click="popup(product.stub)">Quick View</button>
   	</div>
   </div>
 </div>

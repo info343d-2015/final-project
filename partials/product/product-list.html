@@ -5,7 +5,7 @@
             <h3 class="product-title"><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a></h3>
             <h4 class="product-price">{{product.price | currency }}</h4>
             <!--<p>{{product.categories[0]}}</p> -->
-            <button class="btn btn-primary quick-btn" ng-click="popup(product.stub)">Quick View</button>
+            <button class="btn btn-primary quick-btn fix-bottom-left" ng-click="popup(product.stub)">Quick View</button>
         </div>
     </div>
     <div ng-if="user.role === 'admin'">
