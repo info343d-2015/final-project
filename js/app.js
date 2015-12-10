@@ -184,6 +184,7 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
         $location.path('home');
     });
     $scope.cart = CartService.cart;
+    console.log($scope.cart);
     $scope.removeProduct = CartService.removeFromCart;
 
     $scope.increaseQty = function(item, quantity) {
@@ -203,7 +204,7 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
             }
         }
         return cart;
-    }
+    };
 });
 
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
