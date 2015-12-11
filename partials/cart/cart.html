@@ -12,7 +12,7 @@
 		    <td><i ng-show="item.quantity<1000"ng-click="increaseQty(item, item.quantity)" class="fa fa-plus-circle"></i> {{item.quantity}} 
 		    	<i ng-show="item.quantity>0"ng-click="decreaseQty(item, item.quantity)" class="fa fa-minus-circle"></i></td>
 		    <td>{{item.product.price|currency}} </td>
-		    <td><a ng-click="removeProduct(item)"><i class="fa fa-times"></i></a></td>
+		    <td><i class="fa fa-times" ng-click="removeProduct(item)"></i></td>
 		</tr>
 		<tr>
 			<td></td>

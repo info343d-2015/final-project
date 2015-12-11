@@ -278,6 +278,10 @@ img.promo {
     font-size: 16px;
   }
 
+  .cart-main i:hover {
+    cursor: pointer;
+  }
+
   .product-list-main {
     padding: 30px 10%;
     font-size: 16px;
