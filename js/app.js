@@ -2,6 +2,7 @@
 
 var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty', 'credit-cards']);
 
+// configures the states and routes for the application
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
             url: '/',
@@ -60,14 +61,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
+// Defines information for the header
 app.controller('HeaderCtrl', function($scope, $location, UserService) {
     $scope.user = UserService.user;
-
     $scope.signIn = UserService.loginModal;
 });
 
 //controller for the quick view pop up modal functionality
-
 app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService, ProdId) {
     $scope.avgRating = -1;
 
@@ -107,6 +107,7 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
 
 });
 
+// Controller for the Product List and Detail Page
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
@@ -127,6 +128,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         $scope.searchFilter = category;
     };
 
+    // Creates a list of categories based on the products
     $scope.products.$loaded(function() {
         for(var i = 0; i < $scope.products.length; i++) {
             if($scope.products[i].categories) {
@@ -157,6 +159,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     };
     $scope.avgRating = -1;
 
+    // Loads data for a single product if an id is specified
     if($stateParams.id !== undefined) {
         //$scope.product = $scope.products.$getRecord($stateParams.id);
         $scope.products.$loaded(function() {
@@ -178,13 +181,15 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         $scope.addCategory = ProductService.AddCategory;
         $scope.newCategory = undefined;
         $scope.newReview = {};
+
         $scope.addReview = function() {
             ProductService.CreateReview($scope.product, $scope.newReview.title, $scope.newReview.rating, $scope.newReview.body);
             $scope.newReview = {};
         };
-        $scope.removeReview = ProductService.RemoveReview;
 
+        $scope.removeReview = ProductService.RemoveReview;
     }
+
     $scope.popup = function(stub){
         $uibModal.open({
                templateUrl: 'partials/product/product_modal.html',
@@ -198,6 +203,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     };
 
 });
+
 //controller for the shopping cart functionalities
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
 
@@ -219,6 +225,7 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
         CartService.updateQuantity(item, quantity);
     };
 
+    // Loads the full details for each product in the cart
     $scope.process = function(cart) {
         if(cart !== undefined && cart !== null) {
             for(var i = 0; i < cart.length; i++) {
@@ -241,11 +248,13 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
         }
 });
 
+// Controller to log the user out
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
     UserService.logout();
     $location.path('home');
 });
 
+// Controller for the home page
 app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, ProductService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
@@ -254,7 +263,6 @@ app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, P
         CartService.addToCart(product);
         $scope.quantity = undefined;
     };
-
 
     $scope.popup = function(stub){
         $uibModal.open({
@@ -269,10 +277,11 @@ app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, P
     };
 });
 
-
+// Controller to handle user login
 app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserService) {
 
     $scope.btnCancel = options.btnCancel || false;
+
     $scope.signin = function(login) {
         UserService.signin(login.email, login.password).then(function() {
             if(options.successCall && typeof options.successCall === 'function') options.successCall();
@@ -292,6 +301,7 @@ app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserSer
 
 });
 
+// Controller to handle user signup
 app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserService) {
     $scope.btnCancel = options.btnCancel || false;
 
@@ -308,6 +318,7 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
     }
 });
 
+// Controller for previous user orders
 app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
     $scope.previous = OrderService.previous;
     $scope.asDate = function(input) {
@@ -315,6 +326,7 @@ app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService)
     };
 });
 
+// Controller to check the user out
 app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
     $scope.order = OrderService.order;
 
@@ -328,12 +340,14 @@ app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderS
     };
 });
 
+// Controller for the modal to confirm the item has been added to cart
 app.controller('InCartCtrl', function($scope, $uibModalInstance) {
     $scope.closeModal = function() {
         $uibModalInstance.close();
     };
 });
 
+// Controller for the modal if there is an authentication error
 app.controller('AuthErrorCtrl', function($scope, $uibModalInstance, options) {
     $scope.message = options.message;
     $scope.closeModal = function() {
@@ -341,6 +355,7 @@ app.controller('AuthErrorCtrl', function($scope, $uibModalInstance, options) {
     }
 });
 
+// System Service to handle basic connections with firebase, and refresh callbacks
 app.factory('SystemService', function() {
     var service = {};
     service.ref = new Firebase("https://fire-store.firebaseio.com");
@@ -356,6 +371,7 @@ app.factory('SystemService', function() {
     return service;
 });
 
+// User Service handles user authentication, and other information related to accounts
 app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $uibModal, SystemService) {
     var service = {};
     var Auth = $firebaseAuth(SystemService.ref);
@@ -371,6 +387,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         return users[id];
     };
 
+    // Creates an account for the user, with an optional callback on success
     service.signup = function (user, callback) {
         accountCreated = true;
         Auth.$createUser({
@@ -415,6 +432,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
             });
     };
 
+    // Signs the user in
     service.signin = function (email, password) {
         return Auth.$authWithPassword({
             'email': email,
@@ -437,6 +455,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         });
     };
 
+    // Logs the user out
     service.logout = function () {
         Auth.$unauth();
         if(accountCreated) {
@@ -445,6 +464,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         }
     };
 
+    // Performs backend refresh on user data on login/logout
     Auth.$onAuth(function (authData) {
         if (authData) {
             service.user.userId = authData.uid;
@@ -476,6 +496,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         return service.user.role === 'admin';
     };
 
+    // Requires the user to login prior to accessing a page, with optional success and error callbacks
     service.requireLogin = function(successCall, errorCall) {
         users.$loaded(function() {
             if(!service.isLoggedIn()) {
@@ -498,6 +519,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         });
     };
 
+    // Displays a login modal
     service.loginModal = function(disableCancel, successCall, errorCall) {
         $uibModal.open({
             templateUrl: 'partials/user/login.html',
@@ -515,6 +537,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         });
     };
 
+    // Displays a signup modal
     service.signupModal = function(disableCancel, successCall, errorCall) {
         $uibModal.open({
             templateUrl: 'partials/user/signup.html',
@@ -535,12 +558,14 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     return service;
 });
 
+// Product Service deals with backend service functionality for products, categories, and reviews
 app.factory('ProductService', function($firebaseArray, SystemService, UserService) {
     var service = {};
     var productsRef = SystemService.ref.child('products');
     service.categories = [];
     service.products = $firebaseArray(productsRef);
 
+    // refreshes the available categories
     var updateCategories = function() {
         service.products.$loaded(function() {
             for(var i = 0; i < service.products.length; i++) {
@@ -558,6 +583,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
 
     updateCategories();
 
+    // Creates a new product
     service.CreateProduct = function(name, description, price, manufacturer, image) {
         var obj = {};
         obj.name = name;
@@ -571,6 +597,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
         service.products.$add(obj);
     };
 
+    // Creates a new review
     service.CreateReview = function(product, title, rating, body) {
         var productRef = service.products.$getRecord(product.$id);
         if(productRef.reviews === undefined) {
@@ -586,6 +613,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
         service.products.$save(productRef);
     };
 
+    // Removes an existing review
     service.RemoveReview = function(product, review) {
         var productRef = service.products.$getRecord(product.$id);
         if(review.author === UserService.user.userId || UserService.isAdmin()) {
@@ -594,6 +622,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
         service.products.$save(productRef);
     };
 
+    // Adds a category to a product
     service.AddCategory = function(product, name) {
         var productRef = service.products.$getRecord(product.$id);
         if(productRef.categories === undefined) {
@@ -605,6 +634,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
         service.products.$save(productRef);
     };
 
+    // Retrieves a product based on its ID
     service.RetrieveProduct = function(id) {
         return service.products.$getRecord(id);
     };
@@ -612,6 +642,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
     return service;
 });
 
+// Cart Service saves any items to a cart associated with the user, allowing them to access it later
 app.factory('CartService', function($firebaseObject, $uibModal, SystemService, UserService) {
     var service = {};
     var cartsRef = SystemService.ref.child('carts');
@@ -619,6 +650,7 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
 
     service.cart = {};
 
+    // Refreshes the user's cart
     service.reloadCart = function() {
         if(UserService.isLoggedIn()) {
             carts.$loaded(function() {
@@ -637,6 +669,7 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
     service.reloadCart();
     SystemService.addCall(service.reloadCart);
 
+    // Empties the user's cart
     service.clearCart = function() {
         carts.$loaded(function() {
             service.cart.items = [];
@@ -644,6 +677,7 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
         });
     };
 
+    // Adds an item to a user's cart, merging if it already exists
     service.addToCart = function(product) {
         UserService.requireLogin(function() {
             carts.$loaded(function() {
@@ -665,10 +699,21 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
                 saveCart();
             });
         }, function() {
-            alert('You must login before adding to your cart!');
+            $uibModal.open({
+                templateUrl: 'partials/user/auth-error.html',
+                controller: 'AuthErrorCtrl',
+                resolve: {
+                    options: function() {
+                        var service = {};
+                        service.message = "You must login before adding to your cart!";
+                        return service;
+                    }
+                }
+            });
         });
     };
 
+    // Updates the quantity of an item in the cart
     service.updateQuantity = function(product, quantity) {
         product.quantity = quantity;
         if (product.quantity > 1000) {
@@ -679,11 +724,13 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
         saveCart();
     };
 
+    // Removes an item for the user's cart
     service.removeFromCart = function(product) {
         service.cart.items.splice(indexOf(product, service.cart.items), 1);
         saveCart();
     };
 
+    // Saves the cart to Firebase, stripping away excess data
     function saveCart() {
         var finalCart = {};
         finalCart.items = [];
@@ -697,6 +744,7 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
         carts.$save();
     }
 
+    // Returns the index of an object in an array based on its ID
     function indexOf(o, arr) {
         for (var i = 0; i < arr.length; i++) {
             if (arr[i].id == o.id) {
@@ -709,6 +757,7 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
     return service;
 });
 
+// Order Service deals with retrieving and saving orders once the user has checked out
 app.factory('OrderService', function($firebaseArray, $filter, SystemService, UserService) {
     var service = {};
     var ordersRef = SystemService.ref.child('orders');
@@ -717,10 +766,12 @@ app.factory('OrderService', function($firebaseArray, $filter, SystemService, Use
     service.order = {};
     service.previous = {};
 
+    // Adds an order to the system
     service.addOrder = function(order) {
         orders.$add(order);
     };
 
+    // Refreshes the list of orders
     var refreshOrders = function() {
         if(UserService.isLoggedIn()) {
             orders.$loaded(function() {
