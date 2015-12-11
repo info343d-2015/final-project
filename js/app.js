@@ -1,7 +1,7 @@
 'use strict';
 
 var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty']);
-
+//sets up states for the ui-router
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
             url: '/',
@@ -51,7 +51,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
             templateUrl: 'partials/checkout/checkout-complete.html',
             controller: 'CheckoutCtrl'
         });
-
+    //routes straight to home page if invalid route is typed in
     $urlRouterProvider.otherwise('/');
 });
 
@@ -67,7 +67,7 @@ app.controller('HeaderCtrl', function($scope, $location, UserService, SearchServ
     };
 });
 
-//controller for the modal to make quick view pop up
+//controller for the quick view pop up modal functionality
 
 app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService, ProdId) {
     $scope.avgRating = -1;
@@ -109,13 +109,13 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
 
 });
 
+//controller for the product detail and product list page functionalities
 app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService, SearchService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
     $scope.categories = [];
     $scope.createProduct = ProductService.CreateProduct;
-    //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
@@ -213,7 +213,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     };
 
 });
-
+//controller for the shopping cart functionalities
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
     UserService.requireLogin(null, function() {
         alert('You must login to access your cart');
