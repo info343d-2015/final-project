@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty']);
+var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty', 'credit-cards']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
