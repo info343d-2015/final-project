@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty']);
+var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty', 'credit-cards']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
@@ -23,6 +23,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
         })
         .state('product-list', {
             url: '/products',
+            templateUrl: 'partials/product/product-list.html',
+            controller: 'ProductCtrl'
+        })
+        .state('product-search', {
+            url: '/products/q={query}',
             templateUrl: 'partials/product/product-list.html',
             controller: 'ProductCtrl'
         })
@@ -51,25 +56,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
             templateUrl: 'partials/checkout/checkout-complete.html',
             controller: 'CheckoutCtrl'
         });
-
+    //routes straight to home page if invalid route is typed in
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HeaderCtrl', function($scope, $location, UserService, SearchService, $uibModal) {
+app.controller('HeaderCtrl', function($scope, $location, UserService, $uibModal) {
     $scope.user = UserService.user;
 
     $scope.signIn = UserService.loginModal;
-
-    $scope.search = function() {
-        //console.log("in the search function:" + $scope.searchQuery);
-        SearchService.updateQuery($scope.searchQuery);
-        //$scope.$apply();
-        $location.path("/products");
-
-    };
 });
 
-//controller for the modal to make quick view pop up
+//controller for the quick view pop up modal functionality
 
 app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService, ProdId) {
     $scope.avgRating = -1;
@@ -111,25 +108,22 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
 
 });
 
-app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService, SearchService) {
+app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
     $scope.categories = [];
     $scope.createProduct = ProductService.CreateProduct;
-    //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
         $scope.quantity = undefined;
-        $location.path("cart");
     };
 
-    $scope.searchQuery = SearchService.query;
+    $scope.searchQuery = $stateParams.query;
     $scope.searchFilter = "";
     $scope.sortingCriteria = "name";
     console.log($scope.searchFilter);
-    //console.log($scope.searchQuery);
 
     $scope.updateList = function(category) {
         console.log(category);
@@ -147,13 +141,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                 }
             }
         }
-    })
-
-    // $scope.score5 = 5;
-    // $scope.score4 = 4;
-    // $scope.score3 = 3;
-    // $scope.score2 = 2;
-    // $scope.score1 = 1;
+    });
 
     $scope.ratyOptions = {
         half: false,
@@ -215,7 +203,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     };
 
 });
-
+//controller for the shopping cart functionalities
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
     UserService.requireLogin(null, function() {
         alert('You must login to access your cart');
@@ -223,7 +211,6 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
     });
 
     $scope.cart = CartService.cart;
-    console.log($scope.cart);
     $scope.removeProduct = CartService.removeFromCart;
 
     $scope.increaseQty = function(item, quantity) {
@@ -246,11 +233,11 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
     };
     $scope.Total = function(){
             var county = 0;
-            console.log($scope.cart);
             for(var i=0; i<$scope.cart.items.length; i++){
                 var amount = $scope.cart.items[i];
                 county+=amount.product.price*amount.quantity;
             }
+            CartService.cart.total = county;
             return county;
         }
 });
@@ -268,7 +255,6 @@ app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, P
         product.quantity = quantity;
         CartService.addToCart(product);
         $scope.quantity = undefined;
-        $location.path("cart");
     };
 
 
@@ -290,7 +276,7 @@ app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserSer
     $scope.btnCancel = options.btnCancel || false;
     $scope.signin = function(login) {
         UserService.signin(login.email, login.password).then(function() {
-            if(options.successCall) options.successCall();
+            if(options.successCall && typeof options.successCall === 'function') options.successCall();
         });
         $uibModalInstance.close();
     };
@@ -312,7 +298,7 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
 
     $scope.createAccount = function (signup) {
         UserService.signup(signup, function() {
-            if(options.successCall) options.successCall();
+            if(options.successCall && typeof options.successCall === 'function') options.successCall();
         });
         $uibModalInstance.close();
     };
@@ -324,8 +310,10 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
 });
 
 app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
-    console.log(OrderService.previous.orders);
     $scope.previous = OrderService.previous;
+    $scope.asDate = function(input) {
+        return new Date(input);
+    };
 });
 
 app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
@@ -346,6 +334,13 @@ app.controller('InCartCtrl', function($scope, $uibModalInstance) {
     $scope.closeModal = function() {
         $uibModalInstance.close();
     };
+});
+
+app.controller('AuthErrorCtrl', function($scope, $uibModalInstance, options) {
+    $scope.message = options.message;
+    $scope.closeModal = function() {
+        $uibModalInstance.close();
+    }
 });
 
 app.factory('SystemService', function() {
@@ -407,7 +402,18 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 service.user.userId = authData.uid;
             }).then(service.reloadCart).then(callback)
             .catch(function (error) {
-                console.log(error);
+                $uibModal.open({
+                    templateUrl: 'partials/user/auth-error.html',
+                    controller: 'AuthErrorCtrl',
+                    resolve: {
+                        options: function() {
+                            var service = {};
+                            service.message = "We could not create an account for you.  Please try again";
+                            return service;
+                        }
+                    }
+                });
+                $location.path('home');
             });
     };
 
@@ -416,6 +422,19 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         return Auth.$authWithPassword({
             'email': email,
             'password': password
+        }).catch(function(error) {
+            $uibModal.open({
+                templateUrl: 'partials/user/auth-error.html',
+                controller: 'AuthErrorCtrl',
+                resolve: {
+                    options: function() {
+                        var service = {};
+                        service.message = "We could not sign you in.  Please try again";
+                        return service;
+                    }
+                }
+            });
+            $location.path('home');
         });
     };
 
@@ -456,17 +475,18 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 if(!requiredLogin) {
                     requiredLogin = true;
                     var success = function() {
-                        successCall();
+                        if(successCall && typeof successCall === 'function') successCall();
                         requiredLogin = false;
                     };
                     var error = function() {
-                        errorCall();
+                        if(errorCall && typeof errorCall === 'function') errorCall();
                         requiredLogin = false;
-                    }
+                    };
                     service.loginModal(false, success, error);
                 }
             } else {
-                if(successCall) successCall();
+                if(successCall && typeof successCall === 'function') successCall();
+                requiredLogin = false;
             }
         });
     };
@@ -682,19 +702,6 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
     return service;
 });
 
-app.factory('SearchService', function(SystemService) {
-    var service = {};
-
-    service.updateQuery = function(searchQuery) {
-        //console.log("down in the service: " + searchQuery);
-        service.query = searchQuery;
-
-    };
-    
-    return service;
-
-});
-
 app.factory('OrderService', function($firebaseArray, $filter, SystemService, UserService) {
     var service = {};
     var ordersRef = SystemService.ref.child('orders');
@@ -717,6 +724,7 @@ app.factory('OrderService', function($firebaseArray, $filter, SystemService, Use
         } else {
             service.previous.orders = [];
         }
+        console.log(service.previous);
     };
 
     SystemService.addCall(refreshOrders);

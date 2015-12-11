@@ -22,7 +22,7 @@
 		<div class='form-group' ng-class="{'has-error': paymentForm.expiration.$touched && paymentForm.expiration.$invalid}">
 			<label name='expireInput' class='control-label col-xs-12 col-sm-12 col-md-2'>Expiration Date:</label>
 			<div class='col-xs-6 col-sm-6 col-md-2'>
-				<input type='text' id='expireInput' name='expiration' class='form-control' ng-model='expration' placeholder='MM/YYYY' required ng-minlength='7' ng-maxlength='7' />
+				<input type='text' id='expireInput' name='expiration' class='form-control' ng-model='expiration' placeholder='MM/YYYY' required ng-minlength='7' ng-maxlength='7' />
 			</div>
 		</div>
 		<button class='btn checkout-btn' ng-disabled='paymentForm.$invalid' ng-click="addOrder()" ui-sref='complete'>Submit Order</button>

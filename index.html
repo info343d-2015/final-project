@@ -28,7 +28,7 @@
                   <div class="input-group">
                     <input type="text" class="form-control" size="40" placeholder="Search" ng-model="searchQuery">
                     <span class="input-group-btn">
-                        <button type="submit" ng-click="search()" class="btn navbar-button"><i class="fa fa-search"></i></button>
+                        <button type="submit" ui-sref="product-search({query: searchQuery})" class="btn navbar-button"><i class="fa fa-search"></i></button>
                     </span>
                   </div>
                 </form>
