@@ -220,7 +220,6 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
     });
 
     $scope.cart = CartService.cart;
-    console.log($scope.cart);
     $scope.removeProduct = CartService.removeFromCart;
 
     $scope.increaseQty = function(item, quantity) {
@@ -243,7 +242,6 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
     };
     $scope.Total = function(){
             var county = 0;
-            console.log($scope.cart);
             for(var i=0; i<$scope.cart.items.length; i++){
                 var amount = $scope.cart.items[i];
                 county+=amount.product.price*amount.quantity;
@@ -286,7 +284,7 @@ app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserSer
     $scope.btnCancel = options.btnCancel || false;
     $scope.signin = function(login) {
         UserService.signin(login.email, login.password).then(function() {
-            if(options.successCall) options.successCall();
+            if(options.successCall && typeof options.successCall === 'function') options.successCall();
         });
         $uibModalInstance.close();
     };
@@ -308,7 +306,7 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
 
     $scope.createAccount = function (signup) {
         UserService.signup(signup, function() {
-            if(options.successCall) options.successCall();
+            if(options.successCall && typeof options.successCall === 'function') options.successCall();
         });
         $uibModalInstance.close();
     };
@@ -342,6 +340,13 @@ app.controller('InCartCtrl', function($scope, $uibModalInstance) {
     $scope.closeModal = function() {
         $uibModalInstance.close();
     };
+});
+
+app.controller('AuthErrorCtrl', function($scope, $uibModalInstance, options) {
+    $scope.message = options.message;
+    $scope.closeModal = function() {
+        $uibModalInstance.close();
+    }
 });
 
 app.factory('SystemService', function() {
@@ -403,7 +408,18 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 service.user.userId = authData.uid;
             }).then(service.reloadCart).then(callback)
             .catch(function (error) {
-                console.log(error);
+                $uibModal.open({
+                    templateUrl: 'partials/user/auth-error.html',
+                    controller: 'AuthErrorCtrl',
+                    resolve: {
+                        options: function() {
+                            var service = {};
+                            service.message = "We could not create an account for you.  Please try again";
+                            return service;
+                        }
+                    }
+                });
+                $location.path('home');
             });
     };
 
@@ -412,6 +428,19 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
         return Auth.$authWithPassword({
             'email': email,
             'password': password
+        }).catch(function(error) {
+            $uibModal.open({
+                templateUrl: 'partials/user/auth-error.html',
+                controller: 'AuthErrorCtrl',
+                resolve: {
+                    options: function() {
+                        var service = {};
+                        service.message = "We could not sign you in.  Please try again";
+                        return service;
+                    }
+                }
+            });
+            $location.path('home');
         });
     };
 
@@ -452,17 +481,18 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 if(!requiredLogin) {
                     requiredLogin = true;
                     var success = function() {
-                        successCall();
+                        if(successCall && typeof successCall === 'function') successCall();
                         requiredLogin = false;
                     };
                     var error = function() {
-                        errorCall();
+                        if(errorCall && typeof errorCall === 'function') errorCall();
                         requiredLogin = false;
-                    }
+                    };
                     service.loginModal(false, success, error);
                 }
             } else {
-                if(successCall) successCall();
+                if(successCall && typeof successCall === 'function') successCall();
+                requiredLogin = false;
             }
         });
     };
