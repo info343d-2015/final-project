@@ -361,6 +361,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     var Auth = $firebaseAuth(SystemService.ref);
     var usersRef = SystemService.ref.child('users');
     var requiredLogin = false;
+    var accountCreated = false;
 
     var users = $firebaseObject(usersRef);
     service.$loaded = users.$loaded;
@@ -371,6 +372,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     };
 
     service.signup = function (user, callback) {
+        accountCreated = true;
         Auth.$createUser({
                 'email': user.email,
                 'password': user.password
@@ -418,23 +420,29 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
             'email': email,
             'password': password
         }).catch(function(error) {
-            $uibModal.open({
-                templateUrl: 'partials/user/auth-error.html',
-                controller: 'AuthErrorCtrl',
-                resolve: {
-                    options: function() {
-                        var service = {};
-                        service.message = "We could not sign you in.  Please try again";
-                        return service;
+            if(!accountCreated) {
+                $uibModal.open({
+                    templateUrl: 'partials/user/auth-error.html',
+                    controller: 'AuthErrorCtrl',
+                    resolve: {
+                        options: function() {
+                            var service = {};
+                            service.message = "We could not sign you in.  Please try again";
+                            return service;
+                        }
                     }
-                }
-            });
+                });
+            }
             $location.path('home');
         });
     };
 
     service.logout = function () {
         Auth.$unauth();
+        if(accountCreated) {
+            clearUserData();
+            accountCreated = false;
+        }
     };
 
     Auth.$onAuth(function (authData) {
@@ -447,14 +455,18 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 service.user.role = users[authData.uid].role;
             });
         } else {
-            service.user.userId = undefined;
-            service.user.name = undefined;
-            service.user.recPref = undefined;
-            service.user.avatar = undefined;
-            service.user.role = undefined;
+            clearUserData();
         }
         SystemService.execCalls();
     });
+
+    var clearUserData = function() {
+        service.user.userId = undefined;
+        service.user.name = undefined;
+        service.user.recPref = undefined;
+        service.user.avatar = undefined;
+        service.user.role = undefined;
+    };
 
     service.isLoggedIn = function() {
         return service.user.userId !== undefined;
