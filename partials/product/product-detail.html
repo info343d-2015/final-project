@@ -47,6 +47,9 @@
 
     <div class="row">
         <h3>Reviews</h3>
+        <div class="alert alert-info" ng-if="!user.userId">
+            <strong>Sign in</strong> to add your own review.
+        </div>
         <div class='well' ng-show="product.reviews" ng-repeat="review in product.reviews.slice().reverse()">
             <h4>{{review.title}}</h4>
           
