@@ -208,7 +208,17 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
 
     UserService.requireLogin(null, function() {
-        alert('You must login to access your cart');
+        $uibModal.open({
+            templateUrl: 'partials/user/auth-error.html',
+            controller: 'AuthErrorCtrl',
+            resolve: {
+                options: function() {
+                    var service = {};
+                    service.message = "You must login to access your cart!";
+                    return service;
+                }
+            }
+        });
         $location.path('home');
     });
 
