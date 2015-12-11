@@ -12,7 +12,7 @@
 	    	<label for='nameInput'>Name</label>
 	    	<input type="text" ng-model="user.name" name='name' placeholder="Name" id='nameInput' class='form-control' required />
 	    </div>
-	    <button class="btn btn-default" ng-click='createAccount(user)' ng-disabled='signUp.$invalid'>Sign Up</button>
-	    <button class='btn btn-default' ng-click='close()'>Cancel</button>
+	    <button class="btn quick-btn" ng-click='createAccount(user)' ng-disabled='signUp.$invalid'>Sign Up</button>
+	    <button class='btn quick-btn' ng-if="!btnCancel" ng-click='close()'>Cancel</button>
 	</form>
 </div>

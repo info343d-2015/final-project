@@ -1,11 +1,66 @@
-<div class = "container">
-    <div class = "row">
-        <div class = "col-md-4" ng-repeat = "product in products | filter:searchQuery">
-            <p><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a>
-            <p>{{product.price | currency }}</p>
-            <p>{{product.categories[0]}}</p> 
-            <button class="btn btn-primary" ng-click="popup(product.stub)">Quick View</button>
-        </div>
+<div class="product-list-main container-fluid">
+	<h2>Product List</h2>
+    <div class="row">
+    	<div class="product-sidebar col-xs-12 col-sm-3 col-md-2 col-lg-2">
+    		<form>
+                <div class="form-group">
+                    <h3>Category</h3>
+                    <label><input type="radio" name="category-filter" value="All" ng-click="searchFilter=''" checked>All</label><br>
+                    <span ng-repeat="category in categories"><label><input type="radio" name="category-filter" ng-click="updateList(category)">{{category}}</label><br></span>
+                </div>
+				<div class="form-group">
+					<h3>Sort By</h3>
+					<label><input type="radio" name="sort" value="name" ng-click="sortingCriteria='name'" checked>Name</label><br>
+					<label><input type="radio" name="sort" value="price" ng-click="sortingCriteria='price'">Price Low to High</label><br>
+					<label><input type="radio" name="sort" value="price-reverse" ng-click="sortingCriteria='-price'">Price High to Low</label><br>
+				</div>
+				<!-- Stretch goal, would have to add avgRating to Firebase -->
+                <!-- <div class="form-group">
+                	<h3>Rating</h3>
+                	<div ng-raty="ratyOptions" ng-model="score5"></div>
+                	<div ng-raty="ratyOptions" ng-model="score4"></div>
+                	<div ng-raty="ratyOptions" ng-model="score3"></div>
+                	<div ng-raty="ratyOptions" ng-model="score2"></div>
+                	<div ng-raty="ratyOptions" ng-model="score1"></div>
+                </div> -->
+            </form>
+    	</div>
+    	<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10">
+	        <div class="product col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="product in filtered = (products | orderBy:sortingCriteria | filter:searchQuery | filter:searchFilter)">
+                <div class='col-xs-3 col-sm-12 col-md-12 col-lg-12'>
+	        	  <img class='product-img' ng-src="{{product.image || 'img/placeholder.jpg'}}">
+                </div>
+                <div class='col-xs-4 col-sm-12 col-md-12 col-lg-12'>
+	               <h3 class="product-title"><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a></h3>
+	               <h4 class="product-price">{{product.price | currency }}</h4>
+                </div>
+	            <button class="btn quick-btn fix-bottom-left col-xs-offset-1 col-xs-4 col-sm-6 col-md-6 col-lg-6" ng-click="popup(product.stub)">Quick View</button>
+	        </div>
+	        <p class="no-results-message" ng-if="filtered.length == 0">Sorry, your search returned no results</p>
+
+	    </div>
+    </div>
+    <div ng-if="user.role === 'admin'">
+        <h3>Create Product</h3>
+        <form class="form-inline">
+            <div class="form-group">
+            	<input class="form-control" type="text" ng-model="product.name" placeholder="Name" />
+            </div>
+            <div class="form-group">
+            	<input class="form-control" type="number" ng-model="product.price" placeholder="Price"/>
+            </div>
+            <div class="form-group">
+            	<input class="form-control" type="text" ng-model="product.manufacturer" placeholder="Manufacturer" />
+            </div>
+            <div class="form-group">
+            	<input class="form-control" type="text" ng-model="product.image" placeholder="Image URL" />
+			</div>
+			<div class="form-group">
+            	<input class="form-control" type="text" class="form-control" ng-model="product.description" placeholder="Description" />
+            </div>
+			<div class="form-group">
+            	<input type="submit" class="btn btn-default quick-btn" ng-click="createProduct(product.name, product.description, product.price, product.manufacturer, product.image)" value="Create Product"/>
+            </div>
+        </form>
     </div>
 </div>
-<p>{{searchQuery}}</p>

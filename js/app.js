@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty']);
+var app = angular.module('FireStore', ['ui.router', 'ui.bootstrap', 'firebase', 'ngRaty', 'credit-cards']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('home', {
@@ -16,8 +16,18 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/user/logout',
             controller: 'LogoutCtrl'
         })
+        .state('orders', {
+            url: '/user/orders',
+            templateUrl: 'partials/user/orders.html',
+            controller: 'OrderCtrl'
+        })
         .state('product-list', {
             url: '/products',
+            templateUrl: 'partials/product/product-list.html',
+            controller: 'ProductCtrl'
+        })
+        .state('product-search', {
+            url: '/products/q={query}',
             templateUrl: 'partials/product/product-list.html',
             controller: 'ProductCtrl'
         })
@@ -34,42 +44,29 @@ app.config(function($stateProvider, $urlRouterProvider) {
         .state('payment', {
             url: '/cart/payment',
             templateUrl: 'partials/checkout/payment.html',
-            controller: 'PaymentCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('address', {
             url: '/cart/shipping-address',
             templateUrl: 'partials/checkout/address.html',
-            controller: 'AddressCtrl'
+            controller: 'CheckoutCtrl'
         })
         .state('complete', {
             url: '/cart/checkout-complete',
             templateUrl: 'partials/checkout/checkout-complete.html',
-            controller: 'CompleteCtrl'
+            controller: 'CheckoutCtrl'
         });
-
+    //routes straight to home page if invalid route is typed in
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HeaderCtrl', function($scope, $location, UserService, SearchService, $uibModal) {
+app.controller('HeaderCtrl', function($scope, $location, UserService, $uibModal) {
     $scope.user = UserService.user;
 
-    $scope.signIn = function() {
-        var modalInstance = $uibModal.open({
-            templateUrl: 'partials/user/login.html',
-            controller: 'LoginCtrl'
-        });
-    };
-
-    $scope.search = function() {
-        console.log("in the search function:" + $scope.searchQuery);
-        SearchService.updateQuery($scope.searchQuery);
-        $location.path("/products");
-    }
-
-
+    $scope.signIn = UserService.loginModal;
 });
 
-//controller for the modal to make quick view pop up
+//controller for the quick view pop up modal functionality
 
 app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal, $uibModalInstance, ProductService, UserService, CartService, ProdId) {
     $scope.avgRating = -1;
@@ -100,6 +97,7 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
     $scope.closemod = function(){
         $uibModalInstance.close();
     }
+
     $scope.ratyOptions = {
         half: false,
         cancel: false,
@@ -107,23 +105,43 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
         starOff: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-off.png',
         starOn: 'https://raw.github.com/wbotelhos/raty/master/lib/images/star-on.png'
     };
+
 });
 
-app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService, SearchService) {
+app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
-    $scope.createProduct = UserService.CreateProduct;
-    //PLAY AROUND WITH THIS FUNCTION HERE SANCHYA
+    $scope.categories = [];
+    $scope.createProduct = ProductService.CreateProduct;
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
         $scope.quantity = undefined;
-        $location.path("cart");
     };
 
-    $scope.searchQuery = SearchService.query;
-    //console.log($scope.searchQuery);
+    $scope.searchQuery = $stateParams.query;
+    $scope.searchFilter = "";
+    $scope.sortingCriteria = "name";
+    console.log($scope.searchFilter);
+
+    $scope.updateList = function(category) {
+        console.log(category);
+        $scope.searchFilter = category;
+    };
+
+    $scope.products.$loaded(function() {
+        for(var i = 0; i < $scope.products.length; i++) {
+            if($scope.products[i].categories) {
+                for(var j = 0; j < $scope.products[i].categories.length; j++) {
+                    var current = $scope.products[i].categories[j];
+                    if($scope.categories.indexOf(current) == -1) {
+                        $scope.categories.push(current);
+                    }
+                }
+            }
+        }
+    });
 
     $scope.ratyOptions = {
         half: false,
@@ -149,6 +167,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                 stub: $stateParams.id
             }, true)[0];
             console.log($scope.product);
+
             var sum = 0;
             if($scope.product.reviews) {
                 for(var i = 0; i < $scope.product.reviews.length; i++) {
@@ -181,12 +200,16 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                    }
                }
             });
-    }
+    };
 
 });
-
+//controller for the shopping cart functionalities
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
-    UserService.requireLogin($location);
+    UserService.requireLogin(null, function() {
+        alert('You must login to access your cart');
+        $location.path('home');
+    });
+
     $scope.cart = CartService.cart;
     $scope.removeProduct = CartService.removeFromCart;
 
@@ -207,7 +230,16 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
             }
         }
         return cart;
-    }
+    };
+    $scope.Total = function(){
+            var county = 0;
+            for(var i=0; i<$scope.cart.items.length; i++){
+                var amount = $scope.cart.items[i];
+                county+=amount.product.price*amount.quantity;
+            }
+            CartService.cart.total = county;
+            return county;
+        }
 });
 
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
@@ -216,64 +248,100 @@ app.controller('LogoutCtrl', function($scope, $location, UserService) {
     $location.path('home'); //TODO: Redirect to pre-existing page
 });
 
-app.controller('HomeCtrl', function($scope, $location, UserService, ProductService, CartService) {
+app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, ProductService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
-    $scope.createProduct = UserService.CreateProduct;
     $scope.addToCart = function(product, quantity) {
         product.quantity = quantity;
         CartService.addToCart(product);
         $scope.quantity = undefined;
-        $location.path("cart");
+    };
+
+
+    $scope.popup = function(stub){
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/product/product_modal.html',
+            controller: 'ProductModal',
+            resolve: {
+                ProdId : function() {
+                    return stub;
+                }
+            }
+        });
     };
 });
 
-app.controller('LoginCtrl', function($scope, $uibModalInstance, UserService, $uibModal) {
 
+app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserService, $uibModal) {
+    $scope.btnCancel = options.btnCancel || false;
     $scope.signin = function(login) {
-        UserService.signin(login.email, login.password);
+        UserService.signin(login.email, login.password).then(function() {
+            if(options.successCall && typeof options.successCall === 'function') options.successCall();
+        });
         $uibModalInstance.close();
     };
 
     $scope.close = function() {
         $uibModalInstance.close();
+        if(options.errorCall) options.errorCall();
     };
 
     $scope.goToSignUp = function() {
         $uibModalInstance.close();
-        var modalInstance = $uibModal.open({
-            templateUrl: 'partials/user/signup.html',
-            controller: 'SignUpCtrl'
-        });
+        UserService.signupModal($scope.btnCancel, options.successCall, options.errorCall);
     };
 
 });
 
-app.controller('SignUpCtrl', function($scope, $uibModalInstance, UserService) {
-            console.log('got here');
+app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserService) {
+    $scope.btnCancel = options.btnCancel || false;
 
     $scope.createAccount = function (signup) {
-        UserService.signup(signup);
+        UserService.signup(signup, function() {
+            if(options.successCall && typeof options.successCall === 'function') options.successCall();
+        });
         $uibModalInstance.close();
     };
 
     $scope.close = function() {
         $uibModalInstance.close();
+        if(options.errorCall) options.errorCall();
     }
 });
 
-app.controller('AddressCtrl', function($scope, UserService) {
-
+app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
+    $scope.previous = OrderService.previous;
+    $scope.asDate = function(input) {
+        return new Date(input);
+    };
 });
 
-app.controller('PaymentCtrl', function($scope, UserService) {
+app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
+    $scope.order = OrderService.order;
 
+    $scope.addOrder = function() {
+        $scope.order.cart = CartService.cart;
+        $scope.order.owner = UserService.user.userId;
+        $scope.order.orderDate = (new Date()).toString();
+        console.log($scope.order);
+        OrderService.addOrder($scope.order);
+        $scope.order = {};
+        CartService.clearCart();
+    };
 });
 
-app.controller('CompleteCtrl', function($scope, UserService) {
-
+app.controller('InCartCtrl', function($scope, $uibModalInstance) {
+    $scope.closeModal = function() {
+        $uibModalInstance.close();
+    };
 });
 
+app.controller('AuthErrorCtrl', function($scope, $uibModalInstance, options) {
+    $scope.message = options.message;
+    $scope.closeModal = function() {
+        $uibModalInstance.close();
+    }
+});
 
 app.factory('SystemService', function() {
     var service = {};
@@ -290,19 +358,21 @@ app.factory('SystemService', function() {
     return service;
 });
 
-app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, SystemService) {
+app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $uibModal, SystemService) {
     var service = {};
     var Auth = $firebaseAuth(SystemService.ref);
     var usersRef = SystemService.ref.child('users');
+    var requiredLogin = false;
 
     var users = $firebaseObject(usersRef);
+    service.$loaded = users.$loaded;
     service.user = {};
 
     service.getUser = function(id) {
         return users[id];
     };
 
-    service.signup = function (user) {
+    service.signup = function (user, callback) {
         console.log("creating user " + user.email);
 
         Auth.$createUser({
@@ -318,7 +388,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
                 }
 
                 if (!service.user.recPref) {
-                    service.user.recPref = user.recPref;
+                    service.user.recPref = user.recPref || 'None';
                 }
 
                 users[authData.uid] = {
@@ -330,10 +400,25 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
                 users.$save();
 
                 service.user.userId = authData.uid;
-            })
+            }).then(service.reloadCart).then(callback)
             .catch(function (error) {
+<<<<<<< HEAD
                 service.error = error;
                 console.log(error);
+=======
+                $uibModal.open({
+                    templateUrl: 'partials/user/auth-error.html',
+                    controller: 'AuthErrorCtrl',
+                    resolve: {
+                        options: function() {
+                            var service = {};
+                            service.message = "We could not create an account for you.  Please try again";
+                            return service;
+                        }
+                    }
+                });
+                $location.path('home');
+>>>>>>> f8e1c625fdebf993b46a056a94be0f8c87613cb3
             });
     };
 
@@ -342,6 +427,19 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
         return Auth.$authWithPassword({
             'email': email,
             'password': password
+        }).catch(function(error) {
+            $uibModal.open({
+                templateUrl: 'partials/user/auth-error.html',
+                controller: 'AuthErrorCtrl',
+                resolve: {
+                    options: function() {
+                        var service = {};
+                        service.message = "We could not sign you in.  Please try again";
+                        return service;
+                    }
+                }
+            });
+            $location.path('home');
         });
     };
 
@@ -354,12 +452,14 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
             service.user.userId = authData.uid;
             users.$loaded(function() {
                 service.user.name = users[authData.uid].name;
+                service.user.recPref = users[authData.uid].recPref;
                 service.user.avatar = users[authData.uid].avatar;
                 service.user.role = users[authData.uid].role;
             });
         } else {
             service.user.userId = undefined;
             service.user.name = undefined;
+            service.user.recPref = undefined;
             service.user.avatar = undefined;
             service.user.role = undefined;
         }
@@ -374,10 +474,60 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, S
         return service.user.role === 'admin';
     };
 
-    service.requireLogin = function() {
-        if(!service.isLoggedIn()) {
-            $location.path("/user/login");
-        }
+    service.requireLogin = function(successCall, errorCall) {
+        users.$loaded(function() {
+            if(!service.isLoggedIn()) {
+                if(!requiredLogin) {
+                    requiredLogin = true;
+                    var success = function() {
+                        if(successCall && typeof successCall === 'function') successCall();
+                        requiredLogin = false;
+                    };
+                    var error = function() {
+                        if(errorCall && typeof errorCall === 'function') errorCall();
+                        requiredLogin = false;
+                    };
+                    service.loginModal(false, success, error);
+                }
+            } else {
+                if(successCall && typeof successCall === 'function') successCall();
+                requiredLogin = false;
+            }
+        });
+    };
+
+    service.loginModal = function(disableCancel, successCall, errorCall) {
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/user/login.html',
+            controller: 'LoginCtrl',
+            backdrop: 'static',
+            resolve: {
+                options: function() {
+                    var service = {};
+                    service.btnCancel = disableCancel;
+                    service.successCall = successCall;
+                    service.errorCall = errorCall;
+                    return service;
+                }
+            }
+        });
+    };
+
+    service.signupModal = function(disableCancel, successCall, errorCall) {
+        var modalInstance = $uibModal.open({
+            templateUrl: 'partials/user/signup.html',
+            controller: 'SignUpCtrl',
+            backdrop: 'static',
+            resolve: {
+                options: function() {
+                    var service = {};
+                    service.btnCancel = disableCancel;
+                    service.successCall = successCall;
+                    service.errorCall = errorCall;
+                    return service;
+                }
+            }
+        });
     };
 
     return service;
@@ -406,14 +556,15 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
 
     updateCategories();
 
-    service.CreateProduct = function(name, description, price) {
+    service.CreateProduct = function(name, description, price, manufacturer, image) {
         var obj = {};
         obj.name = name;
         obj.description = description;
         obj.price = price;
         obj.reviews = [];
         obj.stock = 0;
-        obj.image = "img/placeholder.jpg";
+        obj.image = image || "img/placeholder.jpg";
+        obj.manufacturer = manufacturer;
         obj.stub = name.toLowerCase().replace(/ /g,"-");
         service.products.$add(obj);
     };
@@ -459,7 +610,7 @@ app.factory('ProductService', function($firebaseArray, SystemService, UserServic
     return service;
 });
 
-app.factory('CartService', function($firebaseObject, SystemService, UserService) {
+app.factory('CartService', function($firebaseObject, $uibModal, SystemService, UserService) {
     var service = {};
     var cartsRef = SystemService.ref.child('carts');
     var carts = $firebaseObject(cartsRef);
@@ -477,27 +628,52 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
             });
 
         } else {
-            service.cart.items = undefined; 
+            service.cart.items = [];
         }
     };
 
     service.reloadCart();
     SystemService.addCall(service.reloadCart);
 
+    service.clearCart = function() {
+        carts.$loaded(function() {
+            service.cart.items = [];
+            saveCart();
+        });
+    };
+
     service.addToCart = function(product) {
-        var item = {};
-        item.id = product.$id;
-        item.quantity = product.quantity;
-        if(indexOf(item, service.cart.items) === -1) {
-            service.cart.items.push(item);
-        } else {
-            service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
-        }
-        saveCart();
+        UserService.requireLogin(function() {
+            carts.$loaded(function() {
+                var item = {};
+                item.id = product.$id;
+                item.quantity = product.quantity;
+                if(indexOf(item, service.cart.items) === -1) {
+                    service.cart.items.push(item);
+                } else {
+                    service.cart.items[indexOf(item, service.cart.items)].quantity += item.quantity;
+                    if (service.cart.items[indexOf(item, service.cart.items)].quantity > 1000) {
+                        service.cart.items[indexOf(item, service.cart.items)].quantity = 1000;
+                    }
+                }
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'partials/cart/incart-modal.html',
+                    controller: 'InCartCtrl'
+                });
+                saveCart();
+            });
+        }, function() {
+            alert('You must login before adding to your cart!');
+        });
     };
 
     service.updateQuantity = function(product, quantity) {
         product.quantity = quantity;
+        if (product.quantity > 1000) {
+            product.quantity = 1000;
+        } else if (product.quantity < 1) {
+            product.quantity = 1;
+        }
         saveCart();
     };
 
@@ -507,7 +683,15 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     };
 
     function saveCart() {
-        carts[UserService.user.userId] = service.cart;
+        var finalCart = {};
+        finalCart.items = [];
+        service.cart.items.forEach(function(item) {
+            var obj = {};
+            obj.id = item.id;
+            obj.quantity = item.quantity;
+            finalCart.items.push(obj);
+        });
+        carts[UserService.user.userId] = finalCart;
         carts.$save();
     }
 
@@ -523,14 +707,46 @@ app.factory('CartService', function($firebaseObject, SystemService, UserService)
     return service;
 });
 
-app.factory('SearchService', function(SystemService) {
+app.factory('OrderService', function($firebaseArray, $filter, SystemService, UserService) {
     var service = {};
+    var ordersRef = SystemService.ref.child('orders');
+    var orders = $firebaseArray(ordersRef);
 
-    service.updateQuery = function(searchQuery) {
-        console.log("down in the service: " + searchQuery)
-        service.query = searchQuery;
-    }
-    
+    service.order = {};
+    service.previous = {};
+
+    service.addOrder = function(order) {
+        orders.$add(order);
+    };
+
+    var refreshOrders = function() {
+        if(UserService.isLoggedIn()) {
+            orders.$loaded(function() {
+                service.previous.orders = $filter('filter')(orders, {
+                        owner: UserService.user.userId
+                    }, true) || [];
+            });
+        } else {
+            service.previous.orders = [];
+        }
+        console.log(service.previous);
+    };
+
+    SystemService.addCall(refreshOrders);
+    refreshOrders();
+
     return service;
+});
 
+app.filter("emptyToEnd", function () {
+    return function (array, key) {
+        if(!angular.isArray(array)) return;
+        var present = array.filter(function (item) {
+            return item[key];
+        });
+        var empty = array.filter(function (item) {
+            return !item[key]
+        });
+        return present.concat(empty);
+    };
 });
