@@ -402,10 +402,6 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                 service.user.userId = authData.uid;
             }).then(service.reloadCart).then(callback)
             .catch(function (error) {
-<<<<<<< HEAD
-                service.error = error;
-                console.log(error);
-=======
                 $uibModal.open({
                     templateUrl: 'partials/user/auth-error.html',
                     controller: 'AuthErrorCtrl',
@@ -418,7 +414,6 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
                     }
                 });
                 $location.path('home');
->>>>>>> f8e1c625fdebf993b46a056a94be0f8c87613cb3
             });
     };
 
