@@ -246,6 +246,7 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
                 var amount = $scope.cart.items[i];
                 county+=amount.product.price*amount.quantity;
             }
+            CartService.cart.total = county;
             return county;
         }
 });
