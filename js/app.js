@@ -26,6 +26,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
             templateUrl: 'partials/product/product-list.html',
             controller: 'ProductCtrl'
         })
+        .state('product-search', {
+            url: '/products/q={query}',
+            templateUrl: 'partials/product/product-list.html',
+            controller: 'ProductCtrl'
+        })
         .state('product-detail', {
             url: '/products/{id}',
             templateUrl: 'partials/product/product-detail.html',
@@ -55,16 +60,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HeaderCtrl', function($scope, $location, UserService, SearchService, $uibModal) {
+app.controller('HeaderCtrl', function($scope, $location, UserService, $uibModal) {
     $scope.user = UserService.user;
 
     $scope.signIn = UserService.loginModal;
-
-    $scope.search = function() {
-        //console.log("in the search function:" + $scope.searchQuery);
-        SearchService.updateQuery($scope.searchQuery);
-        $location.path("/products");
-    };
 });
 
 //controller for the modal to make quick view pop up
@@ -109,7 +108,7 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
 
 });
 
-app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService, SearchService) {
+app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location, $uibModal, ProductService, UserService, CartService) {
     $scope.products = ProductService.products;
     $scope.user = UserService.user;
     $scope.getUser = UserService.getUser;
@@ -122,11 +121,10 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         $scope.quantity = undefined;
     };
 
-    $scope.searchQuery = SearchService.query;
+    $scope.searchQuery = $stateParams.query;
     $scope.searchFilter = "";
     $scope.sortingCriteria = "name";
     console.log($scope.searchFilter);
-    //console.log($scope.searchQuery);
 
     $scope.updateList = function(category) {
         console.log(category);
@@ -144,13 +142,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
                 }
             }
         }
-    })
-
-    // $scope.score5 = 5;
-    // $scope.score4 = 4;
-    // $scope.score3 = 3;
-    // $scope.score2 = 2;
-    // $scope.score1 = 1;
+    });
 
     $scope.ratyOptions = {
         half: false,
@@ -707,18 +699,6 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
     }
 
     return service;
-});
-
-app.factory('SearchService', function(SystemService) {
-    var service = {};
-
-    service.updateQuery = function(searchQuery) {
-        //console.log("down in the service: " + searchQuery);
-        service.query = searchQuery;
-    };
-    
-    return service;
-
 });
 
 app.factory('OrderService', function($firebaseArray, $filter, SystemService, UserService) {
