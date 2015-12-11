@@ -63,7 +63,9 @@ app.controller('HeaderCtrl', function($scope, $location, UserService, SearchServ
     $scope.search = function() {
         //console.log("in the search function:" + $scope.searchQuery);
         SearchService.updateQuery($scope.searchQuery);
+        //$scope.$apply();
         $location.path("/products");
+
     };
 });
 
@@ -268,6 +270,7 @@ app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, P
         $scope.quantity = undefined;
         $location.path("cart");
     };
+
 
     $scope.popup = function(stub){
         var modalInstance = $uibModal.open({
@@ -685,6 +688,7 @@ app.factory('SearchService', function(SystemService) {
     service.updateQuery = function(searchQuery) {
         //console.log("down in the service: " + searchQuery);
         service.query = searchQuery;
+
     };
     
     return service;
@@ -719,4 +723,17 @@ app.factory('OrderService', function($firebaseArray, $filter, SystemService, Use
     refreshOrders();
 
     return service;
+});
+
+app.filter("emptyToEnd", function () {
+    return function (array, key) {
+        if(!angular.isArray(array)) return;
+        var present = array.filter(function (item) {
+            return item[key];
+        });
+        var empty = array.filter(function (item) {
+            return !item[key]
+        });
+        return present.concat(empty);
+    };
 });

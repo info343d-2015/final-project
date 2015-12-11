@@ -20,7 +20,10 @@ body {
   position: fixed;
   top: 10px;
   right:15px;
+}
 
+#deletebutton:hover {
+  cursor: pointer;
 }
 
 #navbar ul#user-status a {
@@ -244,6 +247,15 @@ img.promo {
 
 .total {
   text-align: left;
+}
+
+.cart-empty-message {
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+#orders-button {
+  margin: 10px 0px;
 }
 
 .product-list-main {

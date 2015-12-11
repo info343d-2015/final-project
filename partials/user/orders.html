@@ -1,6 +1,6 @@
-<div class="container">
-    <h3>Previous Orders</h3>
-    <table class="table table-striped">
+<div class="cart-main container-fuild">
+    <h2>My Orders</h2>
+    <table ng-if="previous.orders.length != 0" class="table table-striped">
         <tr>
             <td>Order ID</td>
             <td>Order Date</td>
@@ -12,4 +12,5 @@
             <td>{{order.total}}</td>
         </tr>
     </table>
+    <p id="empty-cart-message" ng-if="previous.orders.length == 0">You have no previous orders</p>
 </div>

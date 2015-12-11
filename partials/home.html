@@ -8,7 +8,8 @@
 <div class="container recommendations">
 	<h2>Recommendations</h2>
   <div class='row'>
-  	<div class='product recommended-product col-xs-11 col-sm-11 col-md-3 col-lg-3' ng-repeat='product in products'> <!-- We want to finter on the product catagory that user set.-->
+    <!-- Recommended products are the top 5 products with the most reviews -->
+  	<div class='product recommended-product col-xs-11 col-sm-11 col-md-3 col-lg-3' ng-repeat="product in products | orderBy:'-reviews.length' | emptyToEnd:'reviews' | limitTo:5"> <!-- We want to finter on the product catagory that user set.-->
         <div class='col-xs-3 col-sm-12 col-md-12 col-lg-12'>
     		  <img class='product-img' ng-src="{{product.image || 'img/placeholder.jpg'}}">
         </div>
