@@ -255,7 +255,6 @@ app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, P
         product.quantity = quantity;
         CartService.addToCart(product);
         $scope.quantity = undefined;
-        $location.path("cart");
     };
 
     $scope.popup = function(stub){
