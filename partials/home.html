@@ -8,11 +8,15 @@
 <div class="container recommendations">
 	<h2>Recommendations</h2>
   <div class='row'>
-  	<div class='product recommended-product col-xs-12 col-sm-4 col-md-3 col-lg-3' ng-repeat='product in products'> <!-- We want to finter on the product catagory that user set.-->
-  		<img class='product-img' ng-src="{{product.image || 'img/placeholder.jpg'}}">
-  		<h3 class='product-title'><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a></h3>
-      <h4 class='product-price'>{{product.price | currency }}</h4>
-      <button class="btn quick-btn fix-bottom-left" ng-click="popup(product.stub)">Quick View</button>
+  	<div class='product recommended-product col-xs-11 col-sm-11 col-md-3 col-lg-3' ng-repeat='product in products'> <!-- We want to finter on the product catagory that user set.-->
+        <div class='col-xs-3 col-sm-12 col-md-12 col-lg-12'>
+    		  <img class='product-img' ng-src="{{product.image || 'img/placeholder.jpg'}}">
+        </div>
+        <div class='col-xs-4 col-sm-12 col-md-12 col-lg-12'>
+    		  <h3 class='product-title'><a ui-sref="product-detail({id: product.stub})">{{product.name}}</a></h3>
+          <h4 class='product-price'>{{product.price | currency }}</h4>
+        </div>
+        <button class="btn quick-btn fix-bottom-left col-xs-offset-1 col-xs-4 col-sm-6 col-md-6 col-lg-6" ng-click="popup(product.stub)">Quick View</button>
   	</div>
   </div>
 </div>
