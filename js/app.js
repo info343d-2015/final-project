@@ -120,7 +120,6 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
         product.quantity = quantity;
         CartService.addToCart(product);
         $scope.quantity = undefined;
-        $location.path("cart");
     };
 
     $scope.searchQuery = SearchService.query;
