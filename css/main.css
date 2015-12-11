@@ -166,10 +166,6 @@ img.promo {
     max-height: 300px;
     max-width: 300px;
   }
-
-  .product {
-    font-size: 50%;
-  }
 }
 
 @media (min-width: 768px) {
@@ -184,7 +180,7 @@ img.promo {
   .fix-bottom-left, .modal-btn-wrapper {
     position: absolute;
     bottom: 10px;
-    left: 0px;
+    left: 10px;
   }
 
   .sidebar {

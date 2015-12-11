@@ -4,10 +4,9 @@
 	<div ng-raty="ratyOptions" ng-model="avgRating" ng-if="avgRating!=-1"></div>
 	<h4 class="product-price">{{product.price | currency }}</h4>
 	<p class="product-description">{{product.description}}</p>
-
+	<i ng-click="closemod()" id="deletebutton" class="fa fa-times"></i>
 	<div class="modal-btn-wrapper">
 		<button class="btn quick-btn" ng-click="addcartmod(product)">Add To Cart</button>
-		<i ng-click="closemod()" id="deletebutton" class="fa fa-times"></i>
 		<button class="btn quick-btn" ui-sref='product-detail({id: product.stub})'ng-click="closemod()">More Info</button>
 	</div>
 </div>
