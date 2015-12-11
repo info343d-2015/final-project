@@ -9,7 +9,7 @@
 	    	<input type="password" name='password' ng-model="user.password" placeholder="Password" id='passwordInput' class='form-control' required />
 	    </div>
 	    <a ng-click='goToSignUp()'>Don't have an account. Sign up here.</a><br />
-		<button class='btn btn-default' type='submit' ng-click='signin(user)' ng-disabled='signIn.$invalid'>Sign In</button>
-		<button class='btn btn-default' type='submit' ng-if="!btnCancel" ng-click='close()'>Cancel</button>
+		<button class='btn quick-btn' type='submit' ng-click='signin(user)' ng-disabled='signIn.$invalid'>Sign In</button>
+		<button class='btn quick-btn' type='submit' ng-if="!btnCancel" ng-click='close()'>Cancel</button>
 	</form>
 </div>
