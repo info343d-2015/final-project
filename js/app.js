@@ -60,7 +60,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
-app.controller('HeaderCtrl', function($scope, $location, UserService, $uibModal) {
+app.controller('HeaderCtrl', function($scope, $location, UserService) {
     $scope.user = UserService.user;
 
     $scope.signIn = UserService.loginModal;
@@ -86,17 +86,16 @@ app.controller('ProductModal', function($scope, $stateParams, $filter, $uibModal
                 $scope.avgRating = 0;
             }
         });
+
     $scope.addcartmod = function(product) {
         product.quantity = 1;
         CartService.addToCart(product);
-        console.log(product.name);
         $uibModalInstance.close();
-        //$scope.quantity = undefined;
-        //$location.path("cart");
     };
+
     $scope.closemod = function(){
         $uibModalInstance.close();
-    }
+    };
 
     $scope.ratyOptions = {
         half: false,
@@ -123,10 +122,8 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
     $scope.searchQuery = $stateParams.query;
     $scope.searchFilter = "";
     $scope.sortingCriteria = "name";
-    console.log($scope.searchFilter);
 
     $scope.updateList = function(category) {
-        console.log(category);
         $scope.searchFilter = category;
     };
 
@@ -166,7 +163,6 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             $scope.product = $filter('filter')($scope.products, {
                 stub: $stateParams.id
             }, true)[0];
-            console.log($scope.product);
 
             var sum = 0;
             if($scope.product.reviews) {
@@ -177,9 +173,8 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
             } else {
                 $scope.avgRating = 0;
             }
-            
-            //ProductService.CreateReview($scope.product, 'Great Product', 5, 'This is the body of text.');
         });
+
         $scope.addCategory = ProductService.AddCategory;
         $scope.newCategory = undefined;
         $scope.newReview = {};
@@ -191,7 +186,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
 
     }
     $scope.popup = function(stub){
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
                templateUrl: 'partials/product/product_modal.html',
                controller: 'ProductModal',
                resolve: {
@@ -205,6 +200,7 @@ app.controller('ProductCtrl', function($scope, $stateParams, $filter, $location,
 });
 //controller for the shopping cart functionalities
 app.controller('CartCtrl', function($scope, $location, UserService, ProductService, CartService) {
+
     UserService.requireLogin(null, function() {
         alert('You must login to access your cart');
         $location.path('home');
@@ -216,12 +212,12 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
     $scope.increaseQty = function(item, quantity) {
         quantity++;
         CartService.updateQuantity(item, quantity);
-    }
+    };
 
     $scope.decreaseQty = function(item, quantity) {
         quantity--;
         CartService.updateQuantity(item, quantity);
-    }
+    };
 
     $scope.process = function(cart) {
         if(cart !== undefined && cart !== null) {
@@ -231,21 +227,23 @@ app.controller('CartCtrl', function($scope, $location, UserService, ProductServi
         }
         return cart;
     };
+
     $scope.Total = function(){
-            var county = 0;
-            for(var i=0; i<$scope.cart.items.length; i++){
-                var amount = $scope.cart.items[i];
-                county+=amount.product.price*amount.quantity;
+            var count = 0;
+            if($scope.cart.items) {
+                for(var i = 0; i < $scope.cart.items.length; i++){
+                    var item = $scope.cart.items[i];
+                    count += item.product.price * item.quantity;
+                }
+                CartService.cart.total = count;
             }
-            CartService.cart.total = county;
-            return county;
+            return count;
         }
 });
 
 app.controller('LogoutCtrl', function($scope, $location, UserService) {
-    console.log('logging user out');
     UserService.logout();
-    $location.path('home'); //TODO: Redirect to pre-existing page
+    $location.path('home');
 });
 
 app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, ProductService, CartService) {
@@ -259,7 +257,7 @@ app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, P
 
 
     $scope.popup = function(stub){
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
             templateUrl: 'partials/product/product_modal.html',
             controller: 'ProductModal',
             resolve: {
@@ -272,7 +270,8 @@ app.controller('HomeCtrl', function($scope, $location, $uibModal, UserService, P
 });
 
 
-app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserService, $uibModal) {
+app.controller('LoginCtrl', function($scope, $uibModalInstance, options, UserService) {
+
     $scope.btnCancel = options.btnCancel || false;
     $scope.signin = function(login) {
         UserService.signin(login.email, login.password).then(function() {
@@ -323,7 +322,6 @@ app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderS
         $scope.order.cart = CartService.cart;
         $scope.order.owner = UserService.user.userId;
         $scope.order.orderDate = (new Date()).toString();
-        console.log($scope.order);
         OrderService.addOrder($scope.order);
         $scope.order = {};
         CartService.clearCart();
@@ -373,8 +371,6 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     };
 
     service.signup = function (user, callback) {
-        console.log("creating user " + user.email);
-
         Auth.$createUser({
                 'email': user.email,
                 'password': user.password
@@ -418,7 +414,6 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     };
 
     service.signin = function (email, password) {
-        console.log('signing in ' + email);
         return Auth.$authWithPassword({
             'email': email,
             'password': password
@@ -492,7 +487,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     };
 
     service.loginModal = function(disableCancel, successCall, errorCall) {
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
             templateUrl: 'partials/user/login.html',
             controller: 'LoginCtrl',
             backdrop: 'static',
@@ -509,7 +504,7 @@ app.factory('UserService', function($firebaseObject, $firebaseAuth, $location, $
     };
 
     service.signupModal = function(disableCancel, successCall, errorCall) {
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
             templateUrl: 'partials/user/signup.html',
             controller: 'SignUpCtrl',
             backdrop: 'static',
@@ -651,7 +646,7 @@ app.factory('CartService', function($firebaseObject, $uibModal, SystemService, U
                         service.cart.items[indexOf(item, service.cart.items)].quantity = 1000;
                     }
                 }
-                var modalInstance = $uibModal.open({
+                $uibModal.open({
                     templateUrl: 'partials/cart/incart-modal.html',
                     controller: 'InCartCtrl'
                 });
@@ -724,7 +719,6 @@ app.factory('OrderService', function($firebaseArray, $filter, SystemService, Use
         } else {
             service.previous.orders = [];
         }
-        console.log(service.previous);
     };
 
     SystemService.addCall(refreshOrders);
