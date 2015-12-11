@@ -321,8 +321,10 @@ app.controller('SignUpCtrl', function($scope, $uibModalInstance, options, UserSe
 });
 
 app.controller('OrderCtrl', function($scope, $filter, UserService, OrderService) {
-    console.log(OrderService.previous.orders);
     $scope.previous = OrderService.previous;
+    $scope.asDate = function(input) {
+        return new Date(input);
+    };
 });
 
 app.controller('CheckoutCtrl', function($scope, UserService, CartService, OrderService) {
@@ -713,6 +715,7 @@ app.factory('OrderService', function($firebaseArray, $filter, SystemService, Use
         } else {
             service.previous.orders = [];
         }
+        console.log(service.previous);
     };
 
     SystemService.addCall(refreshOrders);
